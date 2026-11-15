@@ -1,5 +1,6 @@
 import requests
 import json
+import urllib
 
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
@@ -15,4 +16,17 @@ def fetch_versions(options: str = "latest_release"):
         return data["latest"]["snapshot"]
     elif options == "all":
         return data["versions"]
+
+def download_version_jar(version: dict):
+    response = requests.get(version["url"])
+    data = json.loads(response.text)
+
+    jar_url = data["downloads"]["client"]["url"]
+
+    jar_file = urllib.urlopen(jar_url)
+
+    # TODO: write to .minecraft
+    with open(f"{version["id"]}_client.jar", "wb") as f:
+        f.write(jar_file.read())
+
 
