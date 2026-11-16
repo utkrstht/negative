@@ -1,3 +1,4 @@
+# type: ignore
 from urllib.request import urlopen
 from pathlib import Path
 from requests.exceptions import HTTPError
@@ -28,14 +29,8 @@ def fetch_versions(options: str = "latest_release"):
     elif options == "all":
         return data["versions"]
 
-def download_version_jar(version: dict):
-    try:
-        # Open version manifest
-        response = requests.get(version["url"])
-        response.raise_for_status()
-    except HTTPError as e:
-        print(f"Something happened when fetching version-specific manifest: {e}")
-        
+def download_version_jar(version: str, response: requests.Response):
+    # TODO: pass the manifest directly to this function instead of fetching it 
     data = json.loads(response.text)
 
     jar_url = data["downloads"]["client"]["url"]
@@ -47,8 +42,9 @@ def download_version_jar(version: dict):
         print(f"Something happened while downloading client jar: {e}")
 
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
-    jar_dir = Path(MC_DIR) / "versions" / version["id"]
+    jar_dir = Path(MC_DIR) / "versions" / version
     jar_dir.mkdir(parents=True, exist_ok=True)
 
-    with open(jar_dir / f"{version["id"]}.jar", "wb") as f:
+    with open(jar_dir / f"{version}.jar", "wb") as f:
         f.write(jar_file.read())
+
