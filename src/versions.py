@@ -17,7 +17,8 @@ def fetch_versions(options: str = "latest_release") -> str | dict:
         response = requests.get(MANIFEST_URL)
         response.raise_for_status() 
     except HTTPError as e:
-        print(f"Something happened while fetching version manifest: {e.response.text}")   
+        print(f"Something happened while fetching version manifest: {e.response.text}") 
+        return None
 
     data = json.loads(response.text)
 
@@ -41,6 +42,7 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     # This can and should probably be more specific
     except Exception as e:
         print(f"Something happened while downloading client jar: {e}")
+        return None
 
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
     jar_dir = Path(MC_DIR) / "versions" / version
@@ -67,9 +69,11 @@ def download_version_libraries(response: requests.Response) -> None:
         Path(library_dir).parent.mkdir(parents=True, exist_ok=True)
 
         try:
+            # This is inconsistent but I don't like the other methods that use requests instead
             library_jar = urlopen(library["downloads"]["artifact"]["url"])
         except Exception as e:
             print(f"Something happened while downloading library {library["name"]}: {e}")
+            return None
 
         with open(library_dir, "wb") as f:
             f.write(library_jar.read())   
