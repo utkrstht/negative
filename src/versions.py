@@ -11,7 +11,7 @@ MC_DIR = path.expandvars("%APPDATA%\\.minecraft")
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
 # TODO: cache the manifest
-def fetch_versions(options: str = "latest_release"):
+def fetch_versions(options: str = "latest_release") -> str | dict:
     try:
         # Open version manifest
         response = requests.get(MANIFEST_URL)
@@ -29,7 +29,7 @@ def fetch_versions(options: str = "latest_release"):
     elif options == "all":
         return data["versions"]
 
-def download_version_jar(version: str, response: requests.Response):
+def download_version_jar(version: str, response: requests.Response) -> None:
     # TODO: pass the manifest directly to this function instead of fetching it 
     data = json.loads(response.text)
 
@@ -47,4 +47,3 @@ def download_version_jar(version: str, response: requests.Response):
 
     with open(jar_dir / f"{version}.jar", "wb") as f:
         f.write(jar_file.read())
-
