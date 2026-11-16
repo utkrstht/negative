@@ -43,5 +43,5 @@ def download_version_jar(version: dict):
         print(f"Something happened while downloading client jar: {e}")
 
     # TODO: write to .minecraft
-    with open(f"{version["id"]}_client.jar", "wb") as f:
+    with open(f"{version["id"]}.jar", "wb") as f:
         f.write(jar_file.read())
