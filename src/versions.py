@@ -1,6 +1,6 @@
+from urllib.request import urlopen
 import requests
 import json
-import urllib
 
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
@@ -23,10 +23,11 @@ def download_version_jar(version: dict):
 
     jar_url = data["downloads"]["client"]["url"]
 
-    jar_file = urllib.urlopen(jar_url)
+    jar_file = urlopen(jar_url)
 
     # TODO: write to .minecraft
     with open(f"{version["id"]}_client.jar", "wb") as f:
         f.write(jar_file.read())
+        
 
 
