@@ -49,7 +49,7 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     with open(jar_dir / f"{version}.jar", "wb") as f:
         f.write(jar_file.read())
 
-    with open(jar_dir / f"{version}.jar", "w") as f:
+    with open(jar_dir / f"{version}.json", "w") as f:
         f.write(response.text)
 
 def download_version_libraries(response: requests.Response) -> None:
