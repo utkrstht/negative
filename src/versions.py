@@ -1,8 +1,12 @@
 from urllib.request import urlopen
+from pathlib import Path
 from requests.exceptions import HTTPError
+from os import path
 import requests
 import json
 
+# TODO: make this cross-platform
+MC_DIR = path.expandvars("%APPDATA%\\.minecraft")
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
 # TODO: cache the manifest
@@ -42,6 +46,9 @@ def download_version_jar(version: dict):
     except Exception as e:
         print(f"Something happened while downloading client jar: {e}")
 
-    # TODO: write to .minecraft
-    with open(f"{version["id"]}.jar", "wb") as f:
+    # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
+    jar_dir = Path(MC_DIR) / "versions" / version["id"]
+    jar_dir.mkdir(parents=True, exist_ok=True)
+
+    with open(jar_dir / f"{version["id"]}.jar", "wb") as f:
         f.write(jar_file.read())
