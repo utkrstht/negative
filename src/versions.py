@@ -18,16 +18,18 @@ def fetch_versions(options: str = "latest_release"):
         return data["versions"]
 
 def download_version_jar(version: dict):
+    # Open version manifest
     response = requests.get(version["url"])
     data = json.loads(response.text)
 
     jar_url = data["downloads"]["client"]["url"]
 
-    jar_file = urlopen(jar_url)
+    try:
+        jar_file = urlopen(jar_url)
+    # This can and should probably be more specific
+    except Exception as e:
+        print(f"Something happened while downloading client jar: {e}")
 
     # TODO: write to .minecraft
     with open(f"{version["id"]}_client.jar", "wb") as f:
         f.write(jar_file.read())
-        
-
-
