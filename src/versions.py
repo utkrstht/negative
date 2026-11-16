@@ -7,7 +7,7 @@ import requests
 import json
 
 # TODO: make this cross-platform
-MC_DIR = path.expandvars("%APPDATA%\\.minecraft")
+MC_DIR = path.expandvars("%APPDATA%\\.minecrafttest")
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
 # TODO: cache the manifest
@@ -57,17 +57,17 @@ def download_version_libraries(response: requests.Response) -> None:
     libraries = data["libraries"]
 
     for library in libraries:
-        # TODO: check if library is already saved 
+        # TODO: check rules for libraries and download depending on that
         # TODO: verify library jars with sha1 hash provided
-        library_dir = library["downloads"]["artifacts"]["path"]
+        library_dir = rf"{MC_DIR}\libraries\{library["downloads"]["artifact"]["path"]}"
         library_saved = Path(library_dir).exists()
         if library_saved:
             continue
 
-        library_dir.mkdir(parents=True, exist_ok=True)
+        Path(library_dir).parent.mkdir(parents=True, exist_ok=True)
 
         try:
-            library_jar = urlopen(library["downloads"]["artifacts"]["url"])
+            library_jar = urlopen(library["downloads"]["artifact"]["url"])
         except Exception as e:
             print(f"Something happened while downloading library {library["name"]}: {e}")
 

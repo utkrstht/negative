@@ -1,5 +1,5 @@
 # type: ignore
-from versions import fetch_versions, download_version_jar
+from versions import fetch_versions, download_version_jar, download_version_libraries
 from requests.exceptions import HTTPError
 import requests
 
@@ -18,4 +18,5 @@ for version in all_versions:
             print(f"Something happened when fetching version-specific manifest: {e}")
         
         download_version_jar(version["id"], response)
+        download_version_libraries(response)
         break
