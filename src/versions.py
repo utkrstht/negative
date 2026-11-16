@@ -1,13 +1,11 @@
 # type: ignore
 from urllib.request import urlopen
-from pathlib import Path
 from requests.exceptions import HTTPError
-from os import path
+from utils import get_minecraft_dir
 import requests
 import json
 
-# TODO: make this cross-platform
-MC_DIR = path.expandvars("%APPDATA%\\.minecrafttest")
+MC_DIR = get_minecraft_dir()
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
 # TODO: cache the manifest
@@ -45,7 +43,7 @@ def download_version_jar(version: str, response: requests.Response) -> None:
         return None
 
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
-    jar_dir = Path(MC_DIR) / "versions" / version
+    jar_dir = MC_DIR / "versions" / version
     jar_dir.mkdir(parents=True, exist_ok=True)
 
     with open(jar_dir / f"{version}.jar", "wb") as f:
@@ -61,12 +59,12 @@ def download_version_libraries(response: requests.Response) -> None:
     for library in libraries:
         # TODO: check rules for libraries and download depending on that
         # TODO: verify library jars with sha1 hash provided
-        library_dir = rf"{MC_DIR}\libraries\{library["downloads"]["artifact"]["path"]}"
-        library_saved = Path(library_dir).exists()
+        library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
+        library_saved = library_dir.exists()
         if library_saved:
             continue
 
-        Path(library_dir).parent.mkdir(parents=True, exist_ok=True)
+        library_dir.parent.mkdir(parents=True, exist_ok=True)
 
         try:
             # This is inconsistent but I don't like the other methods that use requests instead
