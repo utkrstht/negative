@@ -31,12 +31,12 @@ def fetch_versions(options: str = "latest_release") -> str | dict:
 
 # This function also downloads the JSON manifest for the jar
 def download_version_jar(version: str, response: requests.Response) -> None:
-    # TODO: pass the manifest directly to this function instead of fetching it 
     data = json.loads(response.text)
 
     jar_url = data["downloads"]["client"]["url"]
 
     try:
+        # TODO: verify jar with the sha1 hash provided by manifest
         jar_file = urlopen(jar_url)
     # This can and should probably be more specific
     except Exception as e:
@@ -51,4 +51,25 @@ def download_version_jar(version: str, response: requests.Response) -> None:
 
     with open(jar_dir / f"{version}.jar", "w") as f:
         f.write(response.text)
-        
+
+def download_version_libraries(response: requests.Response) -> None:
+    data = json.loads(response.text)
+    libraries = data["libraries"]
+
+    for library in libraries:
+        # TODO: check if library is already saved 
+        # TODO: verify library jars with sha1 hash provided
+        library_dir = library["downloads"]["artifacts"]["path"]
+        library_saved = Path(library_dir).exists()
+        if library_saved:
+            continue
+
+        library_dir.mkdir(parents=True, exist_ok=True)
+
+        try:
+            library_jar = urlopen(library["downloads"]["artifacts"]["url"])
+        except Exception as e:
+            print(f"Something happened while downloading library {library["name"]}: {e}")
+
+        with open(library_dir, "wb") as f:
+            f.write(library_jar.read())   
