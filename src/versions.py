@@ -1,7 +1,7 @@
 # type: ignore
 from urllib.request import urlopen
 from requests.exceptions import HTTPError
-from utils import get_minecraft_dir
+from utils import get_minecraft_dir, check_sha1_hash
 import requests
 import json
 
@@ -33,9 +33,9 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     data = json.loads(response.text)
 
     jar_url = data["downloads"]["client"]["url"]
+    jar_hash = data["downloads"]["client"]["sha1"]
 
     try:
-        # TODO: verify jar with the sha1 hash provided by manifest
         jar_file = urlopen(jar_url)
     # This can and should probably be more specific
     except Exception as e:
@@ -48,6 +48,9 @@ def download_version_jar(version: str, response: requests.Response) -> None:
 
     with open(jar_dir / f"{version}.jar", "wb") as f:
         f.write(jar_file.read())
+
+    if not check_sha1_hash(f"{str(jar_dir)}\\f{version}.jar"):
+        raise ValueError("The client jar hash does not match the given hash from manifest, your downloaded jar is corrupted.")
 
     with open(jar_dir / f"{version}.json", "w") as f:
         f.write(response.text)
