@@ -14,6 +14,7 @@ def get_operating_system() -> str | None:
         return None
 
 def get_minecraft_dir() -> Path:
+    # It should point to .minecraft, but I don't want to corrupt my minecraft installation so it's going to .minecrafttest
     if sys.platform == "win32":
         return Path.home() / "AppData" / "Roaming" / ".minecrafttest"
     elif sys.platform == "darwin":
