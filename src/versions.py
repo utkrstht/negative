@@ -50,7 +50,7 @@ def download_version_jar(version: str, response: requests.Response) -> None:
         f.write(jar_file.read())
 
     if not check_sha1_hash(f"{str(jar_dir)}\\f{version}.jar"):
-        raise ValueError("The client jar hash does not match the given hash from manifest, your downloaded jar is corrupted.")
+        raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
 
     with open(jar_dir / f"{version}.json", "w") as f:
         f.write(response.text)
@@ -63,6 +63,7 @@ def download_version_libraries(response: requests.Response) -> None:
         # TODO: check rules for libraries and download depending on that
         # TODO: verify library jars with sha1 hash provided
         library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
+        library_hash = library["downloads"]["artifact"]["sha1"]
         library_saved = library_dir.exists()
         if library_saved:
             continue
@@ -78,3 +79,6 @@ def download_version_libraries(response: requests.Response) -> None:
 
         with open(library_dir, "wb") as f:
             f.write(library_jar.read())   
+
+        if not check_sha1_hash(str(library_dir), library_hash):
+            raise ValueError(f"The library ({library["name"]}) jar hash does not match the given hash from manifest, the library jar is corrupted.")
