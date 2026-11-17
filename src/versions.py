@@ -36,6 +36,7 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     jar_hash = data["downloads"]["client"]["sha1"]
 
     try:
+        # TODO: shift this to a utils helper and properly download items
         jar_file = urlopen(jar_url)
     # This can and should probably be more specific
     except Exception as e:
@@ -52,6 +53,7 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     if not check_sha1_hash(f"{str(jar_dir)}\\f{version}.jar"):
         raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
 
+    # I mean this can't really be wrong, otherwise we're screwed because this is our only source of truth lol
     with open(jar_dir / f"{version}.json", "w") as f:
         f.write(response.text)
 
@@ -61,9 +63,14 @@ def download_version_libraries(response: requests.Response) -> None:
 
     for library in libraries:
         # TODO: check rules for libraries and download depending on that
-        # TODO: verify library jars with sha1 hash provided
         library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
         library_hash = library["downloads"]["artifact"]["sha1"]
+        library_rules = library.get("rules")
+
+        if library_rules:
+            os = library_rules[0]["os"]["name"]
+            # TODO: check if os matches our current host os and download
+
         library_saved = library_dir.exists()
         if library_saved:
             continue
