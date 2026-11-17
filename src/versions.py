@@ -53,16 +53,38 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     if not check_sha1_hash(f"{str(jar_dir)}\\{version}.jar", jar_hash):
         raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
 
-    # I mean this can't really be wrong, otherwise we're screwed because this is our only source of truth lol
-    with open(jar_dir / f"{version}.json", "w") as f:
+def download_version_manifests(version: str, response: requests.Response) -> None:
+    data = json.loads(response.text)
+
+    jar_manifest_dir = MC_DIR / "versions" / version / f"{version}.json"
+
+    asset_index_id = data["assetIndex"]["id"]
+    asset_index_dir = MC_DIR / "assets" / "indexes" / f"{asset_index_id}.json"
+    asset_index_url = data["assetIndex"]["url"]
+    asset_index_hash = data["assetIndex"]["sha1"]
+
+    asset_index_dir.parent.mkdir(parents=True, exist_ok=True)
+    
+    try:
+        asset_index = urlopen(asset_index_url)
+    except Exception as e:
+        print(f"Something happened while fetching asset index: {e}")
+        return None
+
+    with open(jar_manifest_dir, 'w') as f:
         f.write(response.text)
+
+    with open(asset_index_dir, 'wb') as f:
+        f.write(asset_index.read())
+
+    if not check_sha1_hash(asset_index_dir, asset_index_hash):
+        raise ValueError("The asset index hash does not match the given hash from manifest, the asset index is corrupted.")
 
 def download_version_libraries(response: requests.Response) -> None:
     data = json.loads(response.text)
     libraries = data["libraries"]
 
     for library in libraries:
-        # TODO: check rules for libraries and download depending on that
         library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
         library_hash = library["downloads"]["artifact"]["sha1"]
         library_rules = library.get("rules")
@@ -92,3 +114,5 @@ def download_version_libraries(response: requests.Response) -> None:
 
         if not check_sha1_hash(str(library_dir), library_hash):
             raise ValueError(f"The library ({library["name"]}) jar hash does not match the given hash from manifest, the library jar is corrupted.")
+
+
