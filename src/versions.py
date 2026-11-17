@@ -50,7 +50,7 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     with open(jar_dir / f"{version}.jar", "wb") as f:
         f.write(jar_file.read())
 
-    if not check_sha1_hash(f"{str(jar_dir)}\\f{version}.jar", jar_hash):
+    if not check_sha1_hash(f"{str(jar_dir)}\\{version}.jar", jar_hash):
         raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
 
     # I mean this can't really be wrong, otherwise we're screwed because this is our only source of truth lol
