@@ -1,7 +1,7 @@
 # type: ignore
 from urllib.request import urlopen
 from requests.exceptions import HTTPError
-from utils import get_minecraft_dir, check_sha1_hash
+from utils import get_minecraft_dir, check_sha1_hash, get_operating_system
 import requests
 import json
 
@@ -68,8 +68,11 @@ def download_version_libraries(response: requests.Response) -> None:
         library_rules = library.get("rules")
 
         if library_rules:
+            # Based on my analysis of the manifest, I'm pretty sure the only rules for the libraries are for the operating system
             os = library_rules[0]["os"]["name"]
-            # TODO: check if os matches our current host os and download
+            # If the library isn't meant for our operating system, skip it
+            if not os == get_operating_system():
+                continue
 
         library_saved = library_dir.exists()
         if library_saved:
