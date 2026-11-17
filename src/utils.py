@@ -2,6 +2,17 @@ from pathlib import Path
 from hashlib import sha1
 import sys
 
+# This function follows the naming conventions that the manifest uses for operating systems
+def get_operating_system() -> str | None:
+    if sys.platform == "win32":
+        return "windows"
+    elif sys.platform == "darwin":
+        return "osx"
+    elif sys.platform == "linux":
+        return "linux"
+    else:
+        return None
+
 def get_minecraft_dir() -> Path:
     if sys.platform == "win32":
         return Path.home() / "AppData" / "Roaming" / ".minecrafttest"
