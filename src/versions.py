@@ -13,7 +13,7 @@ MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 # TODO: cache the manifest
 def fetch_versions(options: str = "latest_release") -> str | dict:
     try:
-        # Open version manifest
+        # Open version manifests
         response = requests.get(MANIFEST_URL)
         response.raise_for_status() 
     except HTTPError as e:
