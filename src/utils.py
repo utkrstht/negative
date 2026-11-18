@@ -46,6 +46,7 @@ def check_sha1_hashf(file: Path, hash: str) -> bool:
 def download_file(file_url: str, file_dir: str | Path, file_hash: str = "") -> None:
     with get(file_url, stream=True, timeout=120) as response:
                 response.raise_for_status()
+                response.raw.decode_content = True
 
                 with TemporaryFile() as t:
                     # Streaming download
