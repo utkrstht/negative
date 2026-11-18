@@ -1,8 +1,6 @@
 # type: ignore
-from urllib.request import urlopen
 from requests.exceptions import HTTPError
-from utils import get_minecraft_dir, check_sha1_hashs, check_sha1_hashf, get_operating_system, download_file
-from tempfile import TemporaryFile
+from utils import get_minecraft_dir, check_sha1_hashf, get_operating_system, download_file
 import requests
 import json
 
@@ -54,6 +52,10 @@ def download_version_manifests(version: str, response: requests.Response) -> Non
 
     jar_manifest_dir = MC_DIR / "versions" / version / f"{version}.json"
 
+    # No checks on this one because this IS the source of truth
+    with open(jar_manifest_dir, 'w') as f:
+        f.write(response.text)
+
     asset_index_id = data["assetIndex"]["id"]
     asset_index_dir = MC_DIR / "assets" / "indexes" / f"{asset_index_id}.json"
     asset_index_url = data["assetIndex"]["url"]
@@ -71,10 +73,6 @@ def download_version_manifests(version: str, response: requests.Response) -> Non
     except requests.RequestException as e:
         print(f"Something happened while downloading asset index: {e}")
         return None
-
-    # No checks on this one because this IS the source of truth
-    with open(jar_manifest_dir, 'w') as f:
-        f.write(response.text)
 
 def download_version_libraries(response: requests.Response) -> None:
     data = json.loads(response.text)
