@@ -96,7 +96,7 @@ def download_version_libraries(response: requests.Response) -> None:
 
         if library_dir.is_file() and check_sha1_hashf(library_dir, library_hash):
             # Library already exists
-            return None
+            continue
 
         library_dir.parent.mkdir(parents=True, exist_ok=True)
 
