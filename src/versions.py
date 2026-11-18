@@ -30,7 +30,6 @@ def fetch_versions(options: str = "latest_release") -> str | dict:
     elif options == "all":
         return data["versions"]
 
-# This function also downloads the JSON manifest for the jar
 def download_version_jar(version: str, response: requests.Response) -> None:
     data = json.loads(response.text)
 
@@ -46,22 +45,18 @@ def download_version_jar(version: str, response: requests.Response) -> None:
         return None
 
     try:
-        # TODO: shift this to a utils helper and properly download items
-        jar_file = urlopen(jar_url)
-    # This can and should probably be more specific
-    except Exception as e:
-        print(f"Something happened while downloading client jar: {e}")
-        return None
+        with requests.get(jar_url, stream=True, timeout=120) as response:
+            response.raise_for_status()
 
-    with TemporaryFile() as t:
-        # Streaming download
-        copyfileobj(jar_file, t)
+            with TemporaryFile() as t:
+                # Streaming download
+                copyfileobj(response.raw, t)
 
-        if not check_sha1_hashs(t, jar_hash):
-            raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
+                if not check_sha1_hashs(t, jar_hash):
+                    raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
 
-        with open(jar_dir, "wb") as f:
-            copyfileobj(t, f)
+                with open(jar_dir, "wb") as f:
+                    copyfileobj(t, f)
 
 def download_version_manifests(version: str, response: requests.Response) -> None:
     data = json.loads(response.text)
