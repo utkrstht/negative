@@ -24,9 +24,17 @@ def get_minecraft_dir() -> Path:
         # Linux/Unix
         return Path.home() / ".minecrafttest"
 
-def check_sha1_hash(file: BufferedIOBase, hash: str) -> bool:
+# Direct file stream
+def check_sha1_hashs(file: BufferedIOBase, hash: str) -> bool:
     file.seek(0)
     digest = file_digest(file, "sha1").hexdigest()
     file.seek(0)
+
+    return digest == hash
+
+# File path
+def check_sha1_hashf(file: Path, hash: str) -> bool:
+    with open(file, "rb") as f:
+        digest = file_digest(f, "sha1").hexdigest()
 
     return digest == hash
