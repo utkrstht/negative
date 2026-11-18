@@ -91,6 +91,9 @@ def download_version_manifests(version: str, response: requests.Response) -> Non
 
                 with open(asset_index_dir, "wb") as f:
                     copyfileobj(t, f)
+    except requests.RequestException as e:
+        print(f"Something happened while downloading asset index: {e}")
+        return None
 
     # No checks on this one because this IS the source of truth
     with open(jar_manifest_dir, 'w') as f:
@@ -102,11 +105,13 @@ def download_version_libraries(response: requests.Response) -> None:
 
     for library in libraries:
         library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
+        library_url = library["downloads"]["artifact"]["url"]
         library_hash = library["downloads"]["artifact"]["sha1"]
         library_rules = library.get("rules")
 
         if library_rules:
             # Based on my analysis of the manifest, I'm pretty sure the only rules for the libraries are for the operating system
+            # Future me: This is mostly true for modern versions, but some versions before 1.19 also include other fields, I will work on this later.
             os = library_rules[0]["os"]["name"]
             # If the library isn't meant for our operating system, skip it
             if not os == get_operating_system():
@@ -119,16 +124,18 @@ def download_version_libraries(response: requests.Response) -> None:
         library_dir.parent.mkdir(parents=True, exist_ok=True)
 
         try:
-            # This is inconsistent but I don't like the other methods that use requests instead
-            library_jar = urlopen(library["downloads"]["artifact"]["url"])
-        except Exception as e:
-            print(f"Something happened while downloading library {library["name"]}: {e}")
-            return None
+            with requests.get(library_url, stream=True, timeout=120) as response:
+                response.raise_for_status()
 
-        with open(library_dir, "wb") as f:
-            f.write(library_jar.read())   
+                with TemporaryFile() as t:
+                    copyfileobj(response.raw, t)
 
-        if not check_sha1_hashf(str(library_dir), library_hash):
-            raise ValueError(f"The library ({library["name"]}) jar hash does not match the given hash from manifest, the library jar is corrupted.")
+                    if not check_sha1_hashs(t, library_hash):
+                        raise ValueError(f"The library {library['name']} hash does not match the given hash from manifest, the library is corrupted.")
 
+                    with open(library_dir, "wb") as f:
+                        copyfileobj(t, f)
+
+        except requests.RequestException as e:
+            print(f"Something happened while downloading library {library['name']}: {e}")
 
