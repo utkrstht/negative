@@ -2,10 +2,10 @@
 from urllib.request import urlopen
 from requests.exceptions import HTTPError
 from utils import get_minecraft_dir, check_sha1_hash, get_operating_system
-import tempfile
+from shutil import copyfileobj
+from tempfile import TemporaryFile
 import requests
 import json
-import shutil
 
 MC_DIR = get_minecraft_dir()
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
@@ -49,16 +49,15 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     jar_dir = MC_DIR / "versions" / version
     jar_dir.mkdir(parents=True, exist_ok=True)
 
-    with tempfile.NamedTemporaryFile(mode='wb') as t:
+    with TemporaryFile() as t:
         t.write(jar_file.read())
 
-        t.seek(0)
-
-        if not check_sha1_hash(f"{str(jar_dir)}\\{version}.jar", jar_hash):
+        if not check_sha1_hash(t, jar_hash):
             raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
-    
+
         with open(jar_dir / f"{version}.jar", "wb") as f:
-            shutil.copyfileobj(f,)
+            copyfileobj(t, f)
+            
 
 
 def download_version_manifests(version: str, response: requests.Response) -> None:
@@ -71,6 +70,7 @@ def download_version_manifests(version: str, response: requests.Response) -> Non
     asset_index_url = data["assetIndex"]["url"]
     asset_index_hash = data["assetIndex"]["sha1"]
 
+    # C:\Users\User\AppData\Roaming\.minecraft\assets\indexes
     asset_index_dir.parent.mkdir(parents=True, exist_ok=True)
     
     try:
