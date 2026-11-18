@@ -73,6 +73,10 @@ def download_version_manifests(version: str, response: requests.Response) -> Non
 
     # C:\Users\User\AppData\Roaming\.minecraft\assets\indexes
     asset_index_dir.parent.mkdir(parents=True, exist_ok=True)
+
+    if asset_index_dir.is_file() and check_sha1_hashf(asset_index_dir, asset_index_hash):
+        # Asset index is already downloaded
+        return None
     
     try:
         with requests.get(asset_index_url, stream=True, timeout=120) as response:
