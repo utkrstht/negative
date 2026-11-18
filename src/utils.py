@@ -1,5 +1,6 @@
 from pathlib import Path
-from hashlib import sha1
+from hashlib import file_digest
+from io import BufferedIOBase
 import sys
 
 # This function follows the naming conventions that the manifest uses for operating systems
@@ -23,17 +24,9 @@ def get_minecraft_dir() -> Path:
         # Linux/Unix
         return Path.home() / ".minecrafttest"
 
-def check_sha1_hash(file_path: str, hash: str) -> bool:
-    h = sha1()
+def check_sha1_hash(file: BufferedIOBase, hash: str) -> bool:
+    file.seek(0)
+    digest = file_digest(file, "sha1").hexdigest()
+    file.seek(0)
 
-    with open(file_path, 'rb') as file:
-        while True:
-            # Reading is buffered, so we can read smaller chunks
-            chunk = file.read(h.block_size)
-            if not chunk:
-                break
-            h.update(chunk)
-
-    file_hash = h.hexdigest()
-
-    return hash == file_hash
+    return digest == hash
