@@ -1,7 +1,7 @@
 # type: ignore
 from urllib.request import urlopen
 from requests.exceptions import HTTPError
-from utils import get_minecraft_dir, check_sha1_hash, get_operating_system
+from utils import get_minecraft_dir, check_sha1_hashs, check_sha1_hashf, get_operating_system
 from shutil import copyfileobj
 from tempfile import TemporaryFile
 import requests
@@ -36,6 +36,14 @@ def download_version_jar(version: str, response: requests.Response) -> None:
 
     jar_url = data["downloads"]["client"]["url"]
     jar_hash = data["downloads"]["client"]["sha1"]
+    # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
+    jar_dir = MC_DIR / "versions" / version / f"{version}.jar"
+
+    jar_dir.parent.mkdir(parents=True, exist_ok=True)
+
+    if jar_dir.is_file() and check_sha1_hashf(jar_dir, jar_hash):
+        # Client JAR is already downloaded
+        return None
 
     try:
         # TODO: shift this to a utils helper and properly download items
@@ -45,15 +53,11 @@ def download_version_jar(version: str, response: requests.Response) -> None:
         print(f"Something happened while downloading client jar: {e}")
         return None
 
-    # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
-    jar_dir = MC_DIR / "versions" / version / f"{version}.jar"
-    jar_dir.parent.mkdir(parents=True, exist_ok=True)
-
     with TemporaryFile() as t:
         # Streaming download
         copyfileobj(jar_file, t)
 
-        if not check_sha1_hash(t, jar_hash):
+        if not check_sha1_hashs(t, jar_hash):
             raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
 
         with open(jar_dir, "wb") as f:
@@ -84,7 +88,7 @@ def download_version_manifests(version: str, response: requests.Response) -> Non
     with open(asset_index_dir, 'wb') as f:
         f.write(asset_index.read())
 
-    if not check_sha1_hash(asset_index_dir, asset_index_hash):
+    if not check_sha1_hashf(asset_index_dir, asset_index_hash):
         raise ValueError("The asset index hash does not match the given hash from manifest, the asset index is corrupted.")
 
 def download_version_libraries(response: requests.Response) -> None:
@@ -119,7 +123,7 @@ def download_version_libraries(response: requests.Response) -> None:
         with open(library_dir, "wb") as f:
             f.write(library_jar.read())   
 
-        if not check_sha1_hash(str(library_dir), library_hash):
+        if not check_sha1_hashf(str(library_dir), library_hash):
             raise ValueError(f"The library ({library["name"]}) jar hash does not match the given hash from manifest, the library jar is corrupted.")
 
 
