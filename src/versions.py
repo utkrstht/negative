@@ -1,8 +1,7 @@
 # type: ignore
 from urllib.request import urlopen
 from requests.exceptions import HTTPError
-from utils import get_minecraft_dir, check_sha1_hashs, check_sha1_hashf, get_operating_system
-from shutil import copyfileobj
+from utils import get_minecraft_dir, check_sha1_hashs, check_sha1_hashf, get_operating_system, download_file
 from tempfile import TemporaryFile
 import requests
 import json
@@ -45,18 +44,7 @@ def download_version_jar(version: str, response: requests.Response) -> None:
         return None
 
     try:
-        with requests.get(jar_url, stream=True, timeout=120) as response:
-            response.raise_for_status()
-
-            with TemporaryFile() as t:
-                # Streaming download
-                copyfileobj(response.raw, t)
-
-                if not check_sha1_hashs(t, jar_hash):
-                    raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
-
-                with open(jar_dir, "wb") as f:
-                    copyfileobj(t, f)
+        download_file(jar_url, jar_dir, jar_hash)
     except requests.RequestException as e:
         print(f"Something happened while downloading client jar: {e}")
         return None
@@ -79,18 +67,7 @@ def download_version_manifests(version: str, response: requests.Response) -> Non
         return None
     
     try:
-        with requests.get(asset_index_url, stream=True, timeout=120) as response:
-            response.raise_for_status()
-
-            with TemporaryFile() as t:
-                # Streaming download
-                copyfileobj(response.raw, t)
-
-                if not check_sha1_hashs(t, asset_index_hash):
-                    raise ValueError("The asset index hash does not match the given hash from manifest, the asset index is corrupted")
-
-                with open(asset_index_dir, "wb") as f:
-                    copyfileobj(t, f)
+        download_file(asset_index_url, asset_index_dir, asset_index_hash)
     except requests.RequestException as e:
         print(f"Something happened while downloading asset index: {e}")
         return None
@@ -124,18 +101,7 @@ def download_version_libraries(response: requests.Response) -> None:
         library_dir.parent.mkdir(parents=True, exist_ok=True)
 
         try:
-            with requests.get(library_url, stream=True, timeout=120) as response:
-                response.raise_for_status()
-
-                with TemporaryFile() as t:
-                    copyfileobj(response.raw, t)
-
-                    if not check_sha1_hashs(t, library_hash):
-                        raise ValueError(f"The library {library['name']} hash does not match the given hash from manifest, the library is corrupted.")
-
-                    with open(library_dir, "wb") as f:
-                        copyfileobj(t, f)
-
+           download_file(library_url, library_dir, library_hash)
         except requests.RequestException as e:
             print(f"Something happened while downloading library {library['name']}: {e}")
 
