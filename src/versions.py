@@ -46,16 +46,17 @@ def download_version_jar(version: str, response: requests.Response) -> None:
         return None
 
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
-    jar_dir = MC_DIR / "versions" / version
-    jar_dir.mkdir(parents=True, exist_ok=True)
+    jar_dir = MC_DIR / "versions" / version / f"{version}.jar"
+    jar_dir.parent.mkdir(parents=True, exist_ok=True)
 
     with TemporaryFile() as t:
+        # Streaming download
         copyfileobj(jar_file, t)
 
         if not check_sha1_hash(t, jar_hash):
             raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
 
-        with open(jar_dir / f"{version}.jar", "wb") as f:
+        with open(jar_dir, "wb") as f:
             copyfileobj(t, f)
 
 def download_version_manifests(version: str, response: requests.Response) -> None:
