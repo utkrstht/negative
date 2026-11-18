@@ -50,15 +50,13 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     jar_dir.mkdir(parents=True, exist_ok=True)
 
     with TemporaryFile() as t:
-        t.write(jar_file.read())
+        copyfileobj(jar_file, t)
 
         if not check_sha1_hash(t, jar_hash):
             raise ValueError("The client jar hash does not match the given hash from manifest, the downloaded jar is corrupted.")
 
         with open(jar_dir / f"{version}.jar", "wb") as f:
             copyfileobj(t, f)
-            
-
 
 def download_version_manifests(version: str, response: requests.Response) -> None:
     data = json.loads(response.text)
