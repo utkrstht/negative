@@ -57,6 +57,9 @@ def download_version_jar(version: str, response: requests.Response) -> None:
 
                 with open(jar_dir, "wb") as f:
                     copyfileobj(t, f)
+    except requests.RequestException as e:
+        print(f"Something happened while downloading client jar: {e}")
+        return None
 
 def download_version_manifests(version: str, response: requests.Response) -> None:
     data = json.loads(response.text)
@@ -72,19 +75,22 @@ def download_version_manifests(version: str, response: requests.Response) -> Non
     asset_index_dir.parent.mkdir(parents=True, exist_ok=True)
     
     try:
-        asset_index = urlopen(asset_index_url)
-    except Exception as e:
-        print(f"Something happened while fetching asset index: {e}")
-        return None
+        with requests.get(asset_index_url, stream=True, timeout=120) as response:
+            response.raise_for_status()
 
+            with TemporaryFile() as t:
+                # Streaming download
+                copyfileobj(response.raw, t)
+
+                if not check_sha1_hashs(t, asset_index_hash):
+                    raise ValueError("The asset index hash does not match the given hash from manifest, the asset index is corrupted")
+
+                with open(asset_index_dir, "wb") as f:
+                    copyfileobj(t, f)
+
+    # No checks on this one because this IS the source of truth
     with open(jar_manifest_dir, 'w') as f:
         f.write(response.text)
-
-    with open(asset_index_dir, 'wb') as f:
-        f.write(asset_index.read())
-
-    if not check_sha1_hashf(asset_index_dir, asset_index_hash):
-        raise ValueError("The asset index hash does not match the given hash from manifest, the asset index is corrupted.")
 
 def download_version_libraries(response: requests.Response) -> None:
     data = json.loads(response.text)
