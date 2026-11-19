@@ -47,32 +47,12 @@ def download_version_jar(version: str, response: requests.Response) -> None:
         print(f"Something happened while downloading client jar: {e}")
         return None
 
-def download_version_manifests(version: str, response: requests.Response) -> None:
-    data = json.loads(response.text)
-
+def download_version_manifest(version: str, response: requests.Response) -> None:
     jar_manifest_dir = MC_DIR / "versions" / version / f"{version}.json"
 
     # No checks on this one because this IS the source of truth
     with open(jar_manifest_dir, 'w') as f:
         f.write(response.text)
-
-    asset_index_id = data["assetIndex"]["id"]
-    asset_index_dir = MC_DIR / "assets" / "indexes" / f"{asset_index_id}.json"
-    asset_index_url = data["assetIndex"]["url"]
-    asset_index_hash = data["assetIndex"]["sha1"]
-
-    # C:\Users\User\AppData\Roaming\.minecraft\assets\indexes
-    asset_index_dir.parent.mkdir(parents=True, exist_ok=True)
-
-    if asset_index_dir.is_file() and check_sha1_hashf(asset_index_dir, asset_index_hash):
-        # Asset index is already downloaded
-        return None
-    
-    try:
-        download_file(asset_index_url, asset_index_dir, asset_index_hash)
-    except requests.RequestException as e:
-        print(f"Something happened while downloading asset index: {e}")
-        return None
 
 def download_version_libraries(response: requests.Response) -> None:
     data = json.loads(response.text)
