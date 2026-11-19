@@ -35,3 +35,10 @@ def resolve_asset(asset_hash: str) -> dict:
     asset_dict = {"url": asset_url, "local": asset_dir, "hash": asset_hash}
 
     return asset_dict
+
+def download_asset(asset_dict: dict) -> None:
+    try: 
+        download_file(asset_dict['url'], asset_dict['local'], asset_dict['hash'])
+    except requests.RequestException as e:
+        print(f"Something happened while downloading asset {asset_dict['url']}: {e}")
+        return None
