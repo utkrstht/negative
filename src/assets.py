@@ -1,5 +1,6 @@
 from versions import MC_DIR
 from utils import check_sha1_hashf, download_file
+from pathlib import Path
 import requests
 import json
 
@@ -24,3 +25,13 @@ def download_asset_index(response: requests.Response) -> None:
         print(f"Something happened while downloading asset index: {e}")
         return None
 
+def resolve_asset(asset_hash: str) -> dict:
+    # First two letters of asset hash is the asset directory
+    asset_folder = asset_hash[:2]
+
+    asset_url = f"https://resources.download.minecraft.net/{asset_folder}/{asset_hash}"
+    asset_dir = MC_DIR / "assets" / "objects" / asset_folder / f"{asset_hash}"
+
+    asset_dict = {"url": asset_url, "local": asset_dir, "hash": asset_hash}
+
+    return asset_dict
