@@ -2,10 +2,12 @@
 from pathlib import Path
 from hashlib import file_digest
 from io import BufferedIOBase
-from requests import get
 from shutil import copyfileobj
 from tempfile import TemporaryFile
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
 import sys
+import requests
 
 # This function follows the naming conventions that the manifest uses for operating systems
 def get_operating_system() -> str | None:
@@ -43,12 +45,24 @@ def check_sha1_hashf(file: Path, hash: str) -> bool:
 
     return digest == hash
 
+def create_requests_session(max_workers: int = 16) -> requests.Session:
+    session = requests.Session()
+
+    status_forcelist = [429, 500, 502, 503, 504]
+    retries = Retry(total=3, backoff_factor=0.5, status_forcelist=status_forcelist)
+
+    adapter = HTTPAdapter(pool_connections=max_workers, pool_maxsize=max_workers, max_retries=retries)
+
+    session.mount("https://", adapter)
+
+    return session
+
 def download_file(file_url: str, file_dir: str | Path, file_hash: str = "") -> None:
     if file_dir.is_file() and check_sha1_hashf(file_dir, file_hash): 
         # File is already downloaded
         return None
     
-    with get(file_url, stream=True, timeout=120) as response:
+    with requests.get(file_url, stream=True, timeout=120) as response:
                 response.raise_for_status()
                 response.raw.decode_content = True
 
