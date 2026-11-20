@@ -35,10 +35,6 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
     jar_dir = MC_DIR / "versions" / version / f"{version}.jar"
 
-    if jar_dir.is_file() and check_sha1_hashf(jar_dir, jar_hash):
-        # Client JAR is already downloaded
-        return None
-
     try:
         download_file(jar_url, jar_dir, jar_hash)
     except requests.RequestException as e:
@@ -69,10 +65,6 @@ def download_version_libraries(response: requests.Response) -> None:
             # If the library isn't meant for our operating system, skip it
             if not os == get_operating_system():
                 continue
-
-        if library_dir.is_file() and check_sha1_hashf(library_dir, library_hash):
-            # Library already exists
-            continue
 
         try:
            download_file(library_url, library_dir, library_hash)
