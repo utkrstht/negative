@@ -1,11 +1,12 @@
 from versions import MC_DIR
 from utils import check_sha1_hashf, download_file
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import requests
 import json
 
 
-def download_asset_index(response: requests.Response) -> None:
+def download_asset_index(response: requests.Response) -> Path | None:
     data = json.loads(response.text)
 
     asset_index_id = data["assetIndex"]["id"]
@@ -18,13 +19,15 @@ def download_asset_index(response: requests.Response) -> None:
 
     if asset_index_dir.is_file() and check_sha1_hashf(asset_index_dir, asset_index_hash):
         # Asset index is already downloaded
-        return None
+        return asset_index_dir
     
     try:
         download_file(asset_index_url, asset_index_dir, asset_index_hash)
     except requests.RequestException as e:
         print(f"Something happened while downloading asset index: {e}")
         return None
+
+    return asset_index_dir
 
 def resolve_asset(asset_hash: str) -> dict:
     # First two letters of asset hash is the asset directory
