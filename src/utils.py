@@ -57,12 +57,13 @@ def create_requests_session(max_workers: int = 16) -> requests.Session:
 
     return session
 
-def download_file(file_url: str, file_dir: str | Path, file_hash: str = "") -> None:
+def download_file(file_url: str, file_dir: str | Path, file_hash: str = "", session: requests.Session = None) -> None:
     if file_dir.is_file() and check_sha1_hashf(file_dir, file_hash): 
         # File is already downloaded
         return None
     
-    with requests.get(file_url, stream=True, timeout=120) as response:
+    requester = session or requests
+    with requester.get(file_url, stream=True, timeout=120) as response:
                 response.raise_for_status()
                 response.raw.decode_content = True
 
