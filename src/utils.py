@@ -44,6 +44,10 @@ def check_sha1_hashf(file: Path, hash: str) -> bool:
     return digest == hash
 
 def download_file(file_url: str, file_dir: str | Path, file_hash: str = "") -> None:
+    if file_dir.is_file() and check_sha1_hashf(file_dir, file_hash): 
+        # File is already downloaded
+        return None
+    
     with get(file_url, stream=True, timeout=120) as response:
                 response.raise_for_status()
                 response.raw.decode_content = True
