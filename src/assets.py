@@ -1,8 +1,9 @@
 from versions import MC_DIR
 from utils import check_sha1_hashf, download_file
-from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 import requests
 import json
+
 
 def download_asset_index(response: requests.Response) -> None:
     data = json.loads(response.text)
@@ -42,3 +43,15 @@ def download_asset(asset_dict: dict) -> None:
     except requests.RequestException as e:
         print(f"Something happened while downloading asset {asset_dict['url']}: {e}")
         return None
+
+def process_asset(asset: dict) -> None:
+    asset_hash = asset['hash']
+    asset_dict = resolve_asset(asset_hash)
+
+    download_asset(asset_dict)
+
+def download_assets(asset_index: str) -> None:
+    assets = json.loads(asset_index)['objects']
+
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        list(executor.map(process_asset, assets.values()))
