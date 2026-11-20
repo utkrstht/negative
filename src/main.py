@@ -1,5 +1,6 @@
 # type: ignore
-from versions import fetch_versions, download_version_jar, download_version_libraries, download_version_manifests
+from versions import fetch_versions, download_version_jar, download_version_libraries, download_version_manifest
+from assets import download_asset_index, download_assets
 from requests.exceptions import HTTPError
 import requests
 
@@ -17,7 +18,24 @@ for version in all_versions:
         except HTTPError as e:
             print(f"Something happened when fetching version-specific manifest: {e}")
         
+        print("Downloading client JAR")
         download_version_jar(version["id"], response)
-        download_version_manifests(version["id"], response)
+        print("Downloaded client JAR")
+
+        print("Downloading version manifest")
+        download_version_manifest(version["id"], response)
+        print("Downloaded version manifest")
+
+        print("Downloading asset index")
+        asset_index = download_asset_index(response)
+        print("Downloaded asset index")
+
+        print("Downloading libraries")
         download_version_libraries(response)
+        print("Downloaded libraries")
+
+        print("Downloading assets")
+        with open(asset_index, "r") as f:
+            download_assets(f.read())
+        print("Downloaded assets")
         break
