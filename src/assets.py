@@ -1,5 +1,5 @@
 from versions import MC_DIR
-from utils import check_sha1_hashf, download_file
+from utils import check_sha1_hashf, download_file, create_requests_session
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import requests
@@ -40,21 +40,22 @@ def resolve_asset(asset_hash: str) -> dict:
 
     return asset_dict
 
-def download_asset(asset_dict: dict) -> None:
+def download_asset(asset_dict: dict, session: requests.Session) -> None:
     try: 
-        download_file(asset_dict['url'], asset_dict['local'], asset_dict['hash'])
+        download_file(asset_dict['url'], asset_dict['local'], asset_dict['hash'], session)
     except requests.RequestException as e:
         print(f"Something happened while downloading asset {asset_dict['url']}: {e}")
         return None
 
-def process_asset(asset: dict) -> None:
+def process_asset(session: requests.Session, asset: dict) -> None:
     asset_hash = asset['hash']
     asset_dict = resolve_asset(asset_hash)
 
-    download_asset(asset_dict)
+    download_asset(asset_dict, session)
 
 def download_assets(asset_index: str) -> None:
     assets = json.loads(asset_index)['objects']
+    session = create_requests_session()
 
     with ThreadPoolExecutor(max_workers=16) as executor:
-        list(executor.map(process_asset, assets.values()))
+        list(executor.map(lambda asset: process_asset(session, asset), assets.values()))
