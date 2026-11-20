@@ -1,6 +1,6 @@
 # type: ignore
 from requests.exceptions import HTTPError
-from utils import get_minecraft_dir, check_sha1_hashf, get_operating_system, download_file
+from utils import get_minecraft_dir, get_operating_system, download_file, create_requests_session
 import requests
 import json
 
@@ -52,6 +52,8 @@ def download_version_libraries(response: requests.Response) -> None:
     data = json.loads(response.text)
     libraries = data["libraries"]
 
+    session = create_requests_session()
+
     for library in libraries:
         library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
         library_url = library["downloads"]["artifact"]["url"]
@@ -67,7 +69,7 @@ def download_version_libraries(response: requests.Response) -> None:
                 continue
 
         try:
-           download_file(library_url, library_dir, library_hash)
+           download_file(library_url, library_dir, library_hash, session)
         except requests.RequestException as e:
             print(f"Something happened while downloading library {library['name']}: {e}")
 

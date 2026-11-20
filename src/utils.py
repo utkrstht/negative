@@ -61,7 +61,7 @@ def download_file(file_url: str, file_dir: str | Path, file_hash: str = "", sess
     if file_dir.is_file() and check_sha1_hashf(file_dir, file_hash): 
         # File is already downloaded
         return None
-    
+
     requester = session or requests
     with requester.get(file_url, stream=True, timeout=120) as response:
                 response.raise_for_status()
