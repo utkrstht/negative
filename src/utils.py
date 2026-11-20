@@ -55,6 +55,8 @@ def download_file(file_url: str, file_dir: str | Path, file_hash: str = "") -> N
                     if file_hash:
                         if not check_sha1_hashs(t, file_hash):
                             raise ValueError(f"SHA1 mismatch for file {file_dir}, the downloaded file is corrupted.")
-    
+
+                    file_dir.parent.mkdir(parents=True, exist_ok=True)
+
                     with open(file_dir, "wb") as f:
                         copyfileobj(t, f)
