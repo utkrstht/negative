@@ -35,8 +35,6 @@ def download_version_jar(version: str, response: requests.Response) -> None:
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
     jar_dir = MC_DIR / "versions" / version / f"{version}.jar"
 
-    jar_dir.parent.mkdir(parents=True, exist_ok=True)
-
     if jar_dir.is_file() and check_sha1_hashf(jar_dir, jar_hash):
         # Client JAR is already downloaded
         return None
@@ -75,8 +73,6 @@ def download_version_libraries(response: requests.Response) -> None:
         if library_dir.is_file() and check_sha1_hashf(library_dir, library_hash):
             # Library already exists
             continue
-
-        library_dir.parent.mkdir(parents=True, exist_ok=True)
 
         try:
            download_file(library_url, library_dir, library_hash)
