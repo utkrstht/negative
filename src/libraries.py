@@ -13,11 +13,11 @@ def process_library(session: requests.Session, library: dict) -> None:
 
     if library_rules:
         # Based on my analysis of the manifest, I'm pretty sure the only rules for the libraries are for the operating system
-            # Future me: This is mostly true for modern versions, but some versions before 1.19 also include other fields, I will work on this later.
-            os = library_rules[0]["os"]["name"]
-            # If the library isn't meant for our operating system, skip it
-            if not os == get_operating_system():
-                return None
+        # Future me: This is mostly true for modern versions, but some versions before 1.19 also include other fields, I will work on this later.
+        os = library_rules[0]["os"]["name"]
+        # If the library isn't meant for our operating system, skip it
+        if not os == get_operating_system():
+            return None
 
     try:
         download_file(library_url, library_dir, library_hash, session)

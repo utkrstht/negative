@@ -5,10 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import requests
 import json
 
-
-def download_asset_index(response: requests.Response) -> Path | None:
-    data = json.loads(response.text)
-
+def download_asset_index(data: dict) -> Path | None:
     asset_index_id = data["assetIndex"]["id"]
     asset_index_dir = MC_DIR / "assets" / "indexes" / f"{asset_index_id}.json"
     asset_index_url = data["assetIndex"]["url"]

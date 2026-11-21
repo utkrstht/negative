@@ -27,9 +27,7 @@ def fetch_versions(options: str = "latest_release") -> str | dict:
     elif options == "all":
         return data["versions"]
 
-def download_version_jar(version: str, response: requests.Response) -> None:
-    data = json.loads(response.text)
-
+def download_version_jar(version: str, data: dict) -> None:
     jar_url = data["downloads"]["client"]["url"]
     jar_hash = data["downloads"]["client"]["sha1"]
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar

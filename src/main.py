@@ -3,6 +3,7 @@ from versions import fetch_versions, download_version_jar, download_version_mani
 from assets import download_asset_index, download_assets
 from libraries import download_libraries
 from requests.exceptions import HTTPError
+import json
 import requests
 
 latest = fetch_versions(options="latest_release")
@@ -18,9 +19,11 @@ for version in all_versions:
             response.raise_for_status()
         except HTTPError as e:
             print(f"Something happened when fetching version-specific manifest: {e}")
+
+        data = json.loads(response)
         
         print("Downloading client JAR")
-        download_version_jar(version["id"], response)
+        download_version_jar(version["id"], data)
         print("Downloaded client JAR")
 
         print("Downloading version manifest")
@@ -28,11 +31,11 @@ for version in all_versions:
         print("Downloaded version manifest")
 
         print("Downloading asset index")
-        asset_index = download_asset_index(response)
+        asset_index = download_asset_index(data)
         print("Downloaded asset index")
 
         print("Downloading libraries")
-        download_version_libraries(response)
+        download_libraries(data)
         print("Downloaded libraries")
 
         print("Downloading assets")
