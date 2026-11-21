@@ -1,7 +1,6 @@
 from utils import download_file, create_requests_session, get_operating_system
 from concurrent.futures import ThreadPoolExecutor
 from versions import MC_DIR
-import json
 import requests
 
 def process_library(session: requests.Session, library: dict) -> None:
@@ -24,8 +23,7 @@ def process_library(session: requests.Session, library: dict) -> None:
     except requests.RequestException as e:
         print(f"Something happened while downloading library {library_name}: {e}")
 
-def download_libraries(response: requests.Response) -> None:
-    data = json.loads(response.text)
+def download_libraries(data: dict) -> None:
     libraries = data["libraries"]
 
     session = create_requests_session()

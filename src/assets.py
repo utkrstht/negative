@@ -51,6 +51,7 @@ def process_asset(session: requests.Session, asset: dict) -> None:
     download_asset(asset_dict, session)
 
 def download_assets(asset_index: str) -> None:
+    # TODO: deduplicate hashes before processing
     assets = json.loads(asset_index)['objects']
     session = create_requests_session()
 
