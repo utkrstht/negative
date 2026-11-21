@@ -15,7 +15,7 @@ def get_java_dir() -> Path:
 
     return java
 
-def get_java_exe(version: str, javaw: bool | None = True) -> Path | None:
+def get_java_exe(version: str, javaw: bool = True) -> Path | None:
     base = get_java_dir()
     
     if sys.platform == "win32":
