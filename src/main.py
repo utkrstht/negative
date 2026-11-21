@@ -1,6 +1,7 @@
 # type: ignore
-from versions import fetch_versions, download_version_jar, download_version_libraries, download_version_manifest
+from versions import fetch_versions, download_version_jar, download_version_manifest
 from assets import download_asset_index, download_assets
+from libraries import download_libraries
 from requests.exceptions import HTTPError
 import requests
 
