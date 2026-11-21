@@ -1,6 +1,7 @@
 from pathlib import Path
 import jdk
 import sys
+import shutil
 
 def get_java_dir() -> Path:
     if sys.platform == "win32":
@@ -34,3 +35,18 @@ def get_java_exe(version: str, javaw: bool = True) -> Path | None:
         return java
 
     return None
+
+def download_java(version: str) -> None:
+    runtimes = get_java_dir()
+    runtimes.mkdir(parents=True, exist_ok=True)
+
+    target_folder = runtimes / version
+    if target_folder.exists():
+        return
+
+    java_folder = jdk.install(version=version, jre=True, path=str(runtimes))
+
+    # Rename the folder to a known format for easy future access
+    shutil.move(java_folder, target_folder)
+
+
