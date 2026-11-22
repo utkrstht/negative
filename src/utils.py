@@ -5,7 +5,6 @@ from io import BufferedIOBase
 from tempfile import TemporaryFile
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-from zipfile import ZipFile
 import sys
 import platform
 import shutil
@@ -90,14 +89,3 @@ def download_file(file_url: str, file_dir: str | Path, file_hash: str = "", sess
 
                     with open(file_dir, "wb") as f:
                         shutil.copyfileobj(t, f)
-
-def extract_jar(jar_path: Path, output_dir: Path, exclude_prefixes: tuple = ("META-INF/",)) -> None:
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    with ZipFile(jar_path, 'r') as jar:
-        for member in jar.namelist():
-            # If member is a directory or an excluded directory, skip
-            if member.endswith("/") or member.startswith(exclude_prefixes):
-                continue
-
-            jar.extract(member, output_dir)

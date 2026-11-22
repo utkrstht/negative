@@ -1,4 +1,5 @@
 from pathlib import Path
+from zipfile import ZipFile
 import jdk
 import sys
 import shutil
@@ -48,3 +49,14 @@ def download_java(version: str) -> None:
 
     # Rename the folder to a known format for easy future access
     shutil.move(java_folder, target_folder)
+
+def extract_jar(jar_path: Path, output_dir: Path, exclude_prefixes: tuple = ("META-INF/",)) -> None:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    with ZipFile(jar_path, 'r') as jar:
+        for member in jar.namelist():
+            # If member is a directory or an excluded directory, skip
+            if member.endswith("/") or member.startswith(exclude_prefixes):
+                continue
+
+            jar.extract(member, output_dir)
