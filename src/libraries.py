@@ -54,7 +54,7 @@ def process_native_library(library_dir: Path) -> None:
 
     extract_jar(library_dir, natives_dir)
 
-def process_library(session: requests.Session, library: dict) -> None:
+def process_library(session: requests.Session, library: dict) -> str | None:
     library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
     library_url = library["downloads"]["artifact"]["url"]
     library_hash = library["downloads"]["artifact"]["sha1"]
@@ -62,7 +62,7 @@ def process_library(session: requests.Session, library: dict) -> None:
 
     if not should_i_download_this_library_on_my_pc(library):
         # Not for our computer
-        return None
+        return
 
     try:
         download_file(library_url, library_dir, library_hash, session)
@@ -72,6 +72,9 @@ def process_library(session: requests.Session, library: dict) -> None:
 
     if 'native' in library_name:
         process_native_library(library_dir)
+
+    # This gets passed to classpath
+    return str(library_dir)
 
 def download_libraries(data: dict) -> None:
     libraries = data["libraries"]
