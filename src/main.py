@@ -22,7 +22,7 @@ for version in all_versions:
             print(f"Something happened when fetching version-specific manifest: {e}")
 
         data = json.loads(response.text)
-        java_version = data['javaVersion']['majorVersion']
+        java_version = str(data['javaVersion']['majorVersion'])
         
         print("Downloading client JAR")
         download_version_jar(version["id"], data)
