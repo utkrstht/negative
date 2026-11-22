@@ -2,11 +2,12 @@
 from pathlib import Path
 from hashlib import file_digest
 from io import BufferedIOBase
-from shutil import copyfileobj
 from tempfile import TemporaryFile
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 import sys
+import platform
+import shutil
 import requests
 
 # This function follows the naming conventions that the manifest uses for operating systems
@@ -19,6 +20,14 @@ def get_operating_system() -> str | None:
         return "linux"
     else:
         return None
+
+def get_system_architecture() -> str:
+    if platform.machine() in ["x86_64", "AMD64"]:
+        return "x86_64"
+    elif platform.machine() in ["ARM64", "aarch64", "arm64"]:
+        return "arm64"
+
+    return platform.machine()
 
 def get_minecraft_dir() -> Path:
     # It should point to .minecraft, but I don't want to corrupt my minecraft installation so it's going to .minecrafttest
@@ -69,7 +78,7 @@ def download_file(file_url: str, file_dir: str | Path, file_hash: str = "", sess
 
                 with TemporaryFile() as t:
                     # Streaming download
-                    copyfileobj(response.raw, t)
+                    shutil.copyfileobj(response.raw, t)
 
                     if file_hash:
                         if not check_sha1_hashs(t, file_hash):
@@ -78,4 +87,4 @@ def download_file(file_url: str, file_dir: str | Path, file_hash: str = "", sess
                     file_dir.parent.mkdir(parents=True, exist_ok=True)
 
                     with open(file_dir, "wb") as f:
-                        copyfileobj(t, f)
+                        shutil.copyfileobj(t, f)
