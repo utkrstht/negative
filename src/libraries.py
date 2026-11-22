@@ -1,4 +1,6 @@
 from utils import download_file, create_requests_session, get_operating_system, get_system_architecture
+from pathlib import Path
+from java import extract_jar
 from concurrent.futures import ThreadPoolExecutor
 from versions import MC_DIR
 import requests
@@ -21,7 +23,6 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
     library_name = library['name']
 
     maven_coords = parse_library_name(library_name)
-    artifact_id = maven_coords['artifact_id']
     classifier = maven_coords['classifer']
 
     if classifier:
@@ -35,11 +36,6 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
             if arch in classifier or (arch == "x86_64" and "arm64" not in classifier):
                 return True
 
-    # classifier is string casted because it can be None
-    if "native" in artifact_id or "native" in str(classifier):
-        # Do native library stuff
-        pass
-
     if library_rules:
         # Based on my analysis of the manifest, I'm pretty sure the only rules for the libraries are for the operating system
         # Future me: This is mostly true for modern versions, but some versions before 1.19 also include other fields, I will work on this later.
@@ -51,16 +47,28 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
 
     return True
 
+def process_native_library(library_dir: Path) -> None:
+    natives_dir = MC_DIR / "natives"
+
+    extract_jar(library_dir, natives_dir)
+
 def process_library(session: requests.Session, library: dict) -> None:
     library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
     library_url = library["downloads"]["artifact"]["url"]
     library_hash = library["downloads"]["artifact"]["sha1"]
     library_name = library['name']
 
+    if not should_i_download_this_library_on_my_pc(library):
+        # Not for our computer
+        return None
+
     try:
         download_file(library_url, library_dir, library_hash, session)
     except requests.RequestException as e:
         print(f"Something happened while downloading library {library_name}: {e}")
+
+    if 'native' in library_name:
+        process_native_library(library_dir)
 
 def download_libraries(data: dict) -> None:
     libraries = data["libraries"]
@@ -69,4 +77,3 @@ def download_libraries(data: dict) -> None:
 
     with ThreadPoolExecutor(max_workers=16) as executor:
         list(executor.map(lambda library: process_library(session, library), libraries))
-         
