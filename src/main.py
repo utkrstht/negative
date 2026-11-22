@@ -21,7 +21,7 @@ for version in all_versions:
         except HTTPError as e:
             print(f"Something happened when fetching version-specific manifest: {e}")
 
-        data = json.loads(response)
+        data = json.loads(response.text)
         java_version = data['javaVersion']['majorVersion']
         
         print("Downloading client JAR")
