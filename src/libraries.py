@@ -3,6 +3,19 @@ from concurrent.futures import ThreadPoolExecutor
 from versions import MC_DIR
 import requests
 
+def parse_library_name(library_name: str) -> dict:
+    parts = library_name.split(":")
+
+    group_id = parts[0]
+    artifact_id = parts[1]
+    version = parts[2]
+    # Classifer is optional
+    classifer = parts[3] if len(parts) > 3 else None
+
+    maven_coords = {"group_id": group_id, "artifact_id": artifact_id, "version": version, "classifer": classifer}
+
+    return maven_coords
+
 def process_library(session: requests.Session, library: dict) -> None:
     library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
     library_url = library["downloads"]["artifact"]["url"]
