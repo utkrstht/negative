@@ -48,5 +48,3 @@ def download_java(version: str) -> None:
 
     # Rename the folder to a known format for easy future access
     shutil.move(java_folder, target_folder)
-
-

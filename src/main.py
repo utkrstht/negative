@@ -2,6 +2,7 @@
 from versions import fetch_versions, download_version_jar, download_version_manifest
 from assets import download_asset_index, download_assets
 from libraries import download_libraries
+from java import download_java
 from requests.exceptions import HTTPError
 import json
 import requests
@@ -21,6 +22,7 @@ for version in all_versions:
             print(f"Something happened when fetching version-specific manifest: {e}")
 
         data = json.loads(response)
+        java_version = data['javaVersion']['majorVersion']
         
         print("Downloading client JAR")
         download_version_jar(version["id"], data)
@@ -42,4 +44,8 @@ for version in all_versions:
         with open(asset_index, "r") as f:
             download_assets(f.read())
         print("Downloaded assets")
+
+        print("Downloading Java")
+        download_java(java_version)
+        print("Downloaded Java")
         break
