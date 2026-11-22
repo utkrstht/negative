@@ -35,6 +35,8 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
             # If no architecture is listed, assume it's x86_64 
             if arch in classifier or (arch == "x86_64" and "arm64" not in classifier):
                 return True
+        else:
+            return False
 
     if library_rules:
         # Based on my analysis of the manifest, I'm pretty sure the only rules for the libraries are for the operating system
@@ -78,3 +80,4 @@ def download_libraries(data: dict) -> None:
 
     with ThreadPoolExecutor(max_workers=16) as executor:
         list(executor.map(lambda library: process_library(session, library), libraries))
+
