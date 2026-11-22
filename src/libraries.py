@@ -66,6 +66,7 @@ def process_library(session: requests.Session, library: dict) -> None:
         download_file(library_url, library_dir, library_hash, session)
     except requests.RequestException as e:
         print(f"Something happened while downloading library {library_name}: {e}")
+        return None
 
     if 'native' in library_name:
         process_native_library(library_dir)
