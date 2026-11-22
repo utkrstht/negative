@@ -11,15 +11,15 @@ import shutil
 import requests
 
 # This function follows the naming conventions that the manifest uses for operating systems
-def get_operating_system() -> str | None:
+def get_operating_system() -> str:
     if sys.platform == "win32":
         return "windows"
     elif sys.platform == "darwin":
         return "osx"
     elif sys.platform == "linux":
         return "linux"
-    else:
-        return None
+
+    return sys.platform
 
 def get_system_architecture() -> str:
     if platform.machine() in ["x86_64", "AMD64"]:
@@ -27,6 +27,7 @@ def get_system_architecture() -> str:
     elif platform.machine() in ["ARM64", "aarch64", "arm64"]:
         return "arm64"
 
+    # Meh.
     return platform.machine()
 
 def get_minecraft_dir() -> Path:
