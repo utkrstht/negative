@@ -27,7 +27,7 @@ def fetch_versions(options: str = "latest_release") -> str | dict:
     elif options == "all":
         return data["versions"]
 
-def download_version_jar(version: str, data: dict) -> None:
+def download_version_jar(version: str, data: dict) -> Path | None:
     jar_url = data["downloads"]["client"]["url"]
     jar_hash = data["downloads"]["client"]["sha1"]
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
@@ -38,6 +38,8 @@ def download_version_jar(version: str, data: dict) -> None:
     except requests.RequestException as e:
         print(f"Something happened while downloading client jar: {e}")
         return None
+
+    return jar_dir
 
 def download_version_manifest(version: str, response: requests.Response) -> None:
     jar_manifest_dir = MC_DIR / "versions" / version / f"{version}.json"
