@@ -51,7 +51,7 @@ for version in all_versions:
         download_java(java_version)
         print("Downloaded Java")
 
-        java_path = get_java_exe(version=data['javaVersion']['majorVersion'], javaw=False)
+        java_path = get_java_exe(version=str(data['javaVersion']['majorVersion']), javaw=False)
         main_class = data['mainClass']
 
         game_arguments = parse_game_arguments(username="krstht", game_version=latest, asset_index=asset_index_id)
