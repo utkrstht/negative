@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import requests
 import json
 
-def download_asset_index(data: dict) -> Path | None:
+def download_asset_index(data: dict) -> tuple | None:
     asset_index_id = data["assetIndex"]["id"]
     asset_index_dir = MC_DIR / "assets" / "indexes" / f"{asset_index_id}.json"
     asset_index_url = data["assetIndex"]["url"]
@@ -16,7 +16,7 @@ def download_asset_index(data: dict) -> Path | None:
 
     if asset_index_dir.is_file() and check_sha1_hashf(asset_index_dir, asset_index_hash):
         # Asset index is already downloaded
-        return asset_index_dir
+        return (asset_index_id, asset_index_dir)
     
     try:
         download_file(asset_index_url, asset_index_dir, asset_index_hash)
@@ -24,7 +24,7 @@ def download_asset_index(data: dict) -> Path | None:
         print(f"Something happened while downloading asset index: {e}")
         return None
 
-    return asset_index_dir
+    return (asset_index_id, asset_index_dir)
 
 def resolve_asset(asset_hash: str) -> dict:
     # First two letters of asset hash is the asset directory
