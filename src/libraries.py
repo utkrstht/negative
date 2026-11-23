@@ -2,6 +2,7 @@ from utils import download_file, create_requests_session, get_operating_system, 
 from pathlib import Path
 from java import extract_jar
 from concurrent.futures import ThreadPoolExecutor
+from typing import List
 from versions import MC_DIR
 import requests
 
@@ -76,11 +77,15 @@ def process_library(session: requests.Session, library: dict) -> str | None:
     # This gets passed to classpath
     return str(library_dir)
 
-def download_libraries(data: dict) -> None:
+def download_libraries(data: dict, client_jar: Path) -> List:
     libraries = data["libraries"]
 
     session = create_requests_session()
 
     with ThreadPoolExecutor(max_workers=16) as executor:
-        list(executor.map(lambda library: process_library(session, library), libraries))
+        results = list(executor.map(lambda library: process_library(session, library), libraries))
 
+    # Classpath JARs
+    jars = [path for path in results if path is not None]
+
+    return jars
