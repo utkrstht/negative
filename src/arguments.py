@@ -1,7 +1,8 @@
 from typing import List
 from utils import get_operating_system, get_system_architecture
 from os import pathsep
-from config import NATIVES_DIR, LAUNCHER_NAME, LAUNCHER_VERSION
+from config import MC_DIR, NATIVES_DIR, ASSETS_DIR, LAUNCHER_NAME, LAUNCHER_VERSION
+import hashlib
 
 def parse_jvm_arguments(data: dict, classpath: List) -> List:
     args = data['arguments']['jvm']
@@ -37,3 +38,20 @@ def parse_jvm_arguments(data: dict, classpath: List) -> List:
             continue
 
     return parsed_args
+
+def parse_game_arguments(username: str, game_version: str, asset_index: str) -> List:
+    # Currently hardcoded arguments
+    uuid = hashlib.md5(f"OfflinePlayer:{username}".encode("utf-8")).digest()
+
+    return [
+        "--username", username,
+        "--version", game_version,
+        "--gameDir", str(MC_DIR),
+        "--assetsDir", str(ASSETS_DIR),
+        "--assetIndex", asset_index,
+        "--uuid", uuid,
+        "--accesstoken", "0",
+        "--clientId", "",
+        "--xuid", "",
+        "--versionType", "release"
+    ]

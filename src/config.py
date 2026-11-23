@@ -5,7 +5,6 @@ NATIVES_DIR = MC_DIR / "natives"
 LIBRARY_DIR = MC_DIR / "libraries"
 ASSETS_DIR = MC_DIR / "assets"
 
-
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
 LAUNCHER_NAME = "Negative"
