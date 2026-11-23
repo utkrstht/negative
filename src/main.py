@@ -3,6 +3,7 @@ from versions import fetch_versions, download_version_jar, download_version_mani
 from assets import download_asset_index, download_assets
 from libraries import download_libraries
 from java import download_java
+from arguments import parse_game_arguments, parse_jvm_arguments
 from requests.exceptions import HTTPError
 import json
 import requests
@@ -33,7 +34,7 @@ for version in all_versions:
         print("Downloaded version manifest")
 
         print("Downloading asset index")
-        asset_index = download_asset_index(data)
+        asset_index_id, asset_index_dir = download_asset_index(data)
         print("Downloaded asset index")
 
         print("Downloading libraries")
@@ -42,11 +43,15 @@ for version in all_versions:
         print("Downloaded libraries")
 
         print("Downloading assets")
-        with open(asset_index, "r") as f:
+        with open(asset_index_dir, "r") as f:
             download_assets(f.read())
         print("Downloaded assets")
 
         print("Downloading Java")
         download_java(java_version)
         print("Downloaded Java")
+
+        game_arguments = parse_game_arguments(username="krstht", game_version=latest, asset_index=asset_index_id)
+        jvm_arguments = parse_jvm_arguments(data=data, classpath=classpath)
+        
         break
