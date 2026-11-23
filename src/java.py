@@ -1,10 +1,11 @@
 from pathlib import Path
 from zipfile import ZipFile
-from utils import get_operating_system, get_system_architecture
 from typing import List
+from config import MC_DIR
 import jdk
 import sys
 import shutil
+import subprocess
 
 def get_java_dir() -> Path:
     if sys.platform == "win32":
@@ -62,3 +63,25 @@ def extract_jar(jar_path: Path, output_dir: Path, exclude_prefixes: tuple = ("ME
                 continue
 
             jar.extract(member, output_dir)
+
+# I'll probably shift this to somewhere else
+def launch_minecraft(command: List) -> int:
+    print("Starting Minecraft")
+
+    # TODO: logging files
+    process = subprocess.Popen(
+        command,
+        cwd=MC_DIR,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        bufsize=1
+    )
+
+    if process.stdout is not None:
+        for line in process.stdout:
+            print(line, end="")
+
+    return process.wait()

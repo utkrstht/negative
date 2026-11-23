@@ -2,7 +2,7 @@
 from versions import fetch_versions, download_version_jar, download_version_manifest
 from assets import download_asset_index, download_assets
 from libraries import download_libraries
-from java import download_java
+from java import download_java, get_java_exe
 from arguments import parse_game_arguments, parse_jvm_arguments
 from requests.exceptions import HTTPError
 import json
@@ -51,7 +51,11 @@ for version in all_versions:
         download_java(java_version)
         print("Downloaded Java")
 
+        java_path = get_java_exe(version=data['javaVersion']['majorVersion'], javaw=False)
+
+        
+
         game_arguments = parse_game_arguments(username="krstht", game_version=latest, asset_index=asset_index_id)
         jvm_arguments = parse_jvm_arguments(data=data, classpath=classpath)
-        
+
         break
