@@ -25,7 +25,7 @@ for version in all_versions:
         java_version = str(data['javaVersion']['majorVersion'])
         
         print("Downloading client JAR")
-        download_version_jar(version["id"], data)
+        jar_path = download_version_jar(version["id"], data)
         print("Downloaded client JAR")
 
         print("Downloading version manifest")
@@ -37,7 +37,8 @@ for version in all_versions:
         print("Downloaded asset index")
 
         print("Downloading libraries")
-        download_libraries(data)
+        classpath = download_libraries(data)
+        classpath.append(jar_path)
         print("Downloaded libraries")
 
         print("Downloading assets")
