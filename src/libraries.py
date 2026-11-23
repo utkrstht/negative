@@ -42,8 +42,8 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
     if library_rules:
         # Based on my analysis of the manifest, I'm pretty sure the only rules for the libraries are for the operating system
         # Future me: This is mostly true for modern versions, but some versions before 1.19 also include other fields, I will work on this later.
-        action = library_rules[0]["action"]
-        os = library_rules[0]["os"]["name"]
+        action = library_rules["action"]
+        os = library_rules["os"]["name"]
         # If the library isn't meant for our operating system, skip it
         if not os == get_operating_system() and action == "allow":
             return False
