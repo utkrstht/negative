@@ -2,6 +2,7 @@
 from requests.exceptions import HTTPError
 from config import MC_DIR, MANIFEST_URL
 from utils import download_file
+from pathlib import Path
 import requests
 import json
 
