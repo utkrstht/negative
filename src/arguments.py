@@ -53,7 +53,7 @@ def parse_game_arguments(username: str, game_version: str, asset_index: str) -> 
         "--assetsDir", str(ASSETS_DIR),
         "--assetIndex", asset_index,
         "--uuid", uuid,
-        "--accesstoken", "0",
+        "--accessToken", "0",
         "--clientId", "",
         "--xuid", "",
         "--versionType", "release"
