@@ -1,4 +1,4 @@
-from versions import MC_DIR
+from config import MC_DIR
 from utils import check_sha1_hashf, download_file, create_requests_session
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor

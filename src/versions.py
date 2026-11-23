@@ -1,11 +1,9 @@
 # type: ignore
 from requests.exceptions import HTTPError
-from utils import get_minecraft_dir, get_operating_system, download_file, create_requests_session
+from config import MC_DIR, MANIFEST_URL
+from utils import download_file
 import requests
 import json
-
-MC_DIR = get_minecraft_dir()
-MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
 # TODO: cache the manifest
 def fetch_versions(options: str = "latest_release") -> str | dict:

@@ -3,7 +3,7 @@ from pathlib import Path
 from java import extract_jar
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
-from versions import MC_DIR
+from config import MC_DIR
 import requests
 
 def parse_library_name(library_name: str) -> dict:
