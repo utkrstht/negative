@@ -39,7 +39,7 @@ for version in all_versions:
 
         print("Downloading libraries")
         classpath = download_libraries(data)
-        classpath.append(jar_path)
+        classpath.append(str(jar_path))
         print("Downloaded libraries")
 
         print("Downloading assets")
