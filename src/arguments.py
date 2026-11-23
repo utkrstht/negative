@@ -1,13 +1,20 @@
 from typing import List
 from utils import get_operating_system, get_system_architecture
+from os import pathsep
+from config import NATIVES_DIR, LAUNCHER_NAME, LAUNCHER_VERSION
 
-def parse_jvm_arguments(data: dict) -> List:
+def parse_jvm_arguments(data: dict, classpath: List) -> List:
     args = data['arguments']['jvm']
 
     parsed_args = []
+    classpath_str = pathsep.join(classpath)
 
     for arg in args:
         if isinstance(arg, str):
+            arg = arg.replace("${natives_directory}", str(NATIVES_DIR))
+            arg = arg.replace("${launcher_name}", str(LAUNCHER_NAME))
+            arg = arg.replace("${launcher_version}", str(LAUNCHER_VERSION))
+            arg = arg.replace("${classpath}", classpath_str)
             parsed_args.append(arg)
             continue
 
