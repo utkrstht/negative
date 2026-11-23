@@ -77,7 +77,7 @@ def process_library(session: requests.Session, library: dict) -> str | None:
     # This gets passed to classpath
     return str(library_dir)
 
-def download_libraries(data: dict, client_jar: Path) -> List:
+def download_libraries(data: dict) -> List:
     libraries = data["libraries"]
 
     session = create_requests_session()
