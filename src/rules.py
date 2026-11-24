@@ -16,28 +16,14 @@ def evalute_rules(rules: list) -> bool:
             rule_os = rule_info.get('name')
             rule_arch = rule_info.get('arch')
 
-        # Allow all
-        if action == "allow" and not rule_os and not rule_arch:
-            allow = True
+        matches = (
+            (not rule_os or rule_os == sys_os)
+            and
+            (not rule_arch or rule_arch == sys_arch)
+        )
 
-        # Allow our operating system
-        if action == "allow" and rule_os == sys_os:
-            allow = True
-
-        # Allow our system architecture
-        if action == "allow" and rule_arch == sys_arch:
-            allow = True
-
-        # Disallow all
-        if action == "disallow" and not rule_os and not rule_arch:
-            allow = False
-
-        # Disallow our operating system
-        if action == "disallow" and rule_os == sys_os:
-            allow = False
-
-        # Disallow our system architecture
-        if action == "disallow" and rule_arch == sys_arch:
-            allow = False
+        if matches:
+            # If the rules os/arch match with ours, check if it's allowed or not
+            allow = action == "allow"
 
     return allow
