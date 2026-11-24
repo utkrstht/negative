@@ -8,7 +8,7 @@ from requests.exceptions import HTTPError
 import json
 import requests
 
-latest = fetch_versions(options="latest_release")
+latest = "1.19"
 
 all_versions = fetch_versions(options="all")
 

@@ -6,6 +6,14 @@ import hashlib
 # Because otherwise this would cause naming conflicts
 import uuid as uid
 
+def populate_placeholders(arg: str, classpath: str) -> str:
+    arg = arg.replace("${natives_directory}", str(NATIVES_DIR))
+    arg = arg.replace("${launcher_name}", str(LAUNCHER_NAME))
+    arg = arg.replace("${launcher_version}", str(LAUNCHER_VERSION))
+    arg = arg.replace("${classpath}", classpath)
+
+    return arg
+
 def parse_jvm_arguments(data: dict, classpath: List) -> List:
     args = data['arguments']['jvm']
 
@@ -14,10 +22,7 @@ def parse_jvm_arguments(data: dict, classpath: List) -> List:
 
     for arg in args:
         if isinstance(arg, str):
-            arg = arg.replace("${natives_directory}", str(NATIVES_DIR))
-            arg = arg.replace("${launcher_name}", str(LAUNCHER_NAME))
-            arg = arg.replace("${launcher_version}", str(LAUNCHER_VERSION))
-            arg = arg.replace("${classpath}", classpath_str)
+            arg = populate_placeholders(arg, classpath_str)
             parsed_args.append(arg)
             continue
 
@@ -36,12 +41,17 @@ def parse_jvm_arguments(data: dict, classpath: List) -> List:
             if not os == get_operating_system() and action == "allow" or os == get_operating_system() and action == "disallow":
                 continue
 
-            parsed_args.append(arg['value'])
+            value = arg['value']
+            if isinstance(value, list):
+                # <1.19 can have values as lists
+                parsed_args.append(populate_placeholders(item, classpath_str) for item in value)
+            else:
+                parsed_args.append(populate_placeholders(value, classpath_str))
             continue
 
     return parsed_args
 
-def parse_game_arguments(username: str, game_version: str, asset_index: str) -> List:
+def prse_game_arguments(username: str, game_version: str, asset_index: str) -> List:
     # Currently hardcoded arguments
     raw_uuid = hashlib.md5(f"OfflinePlayer:{username}".encode("utf-8")).digest()
     uuid = uid.UUID(bytes=raw_uuid, version=3).hex
