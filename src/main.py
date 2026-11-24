@@ -55,7 +55,7 @@ for version in all_versions:
         java_path = get_java_exe(version=str(data['javaVersion']['majorVersion']), javaw=False)
         main_class = data['mainClass']
 
-        game_arguments = parse_game_arguments(username="krstht", game_version=latest, asset_index=asset_index_id)
+        game_arguments = parse_game_arguments(username="krstht", game_version=target, asset_index=asset_index_id)
         jvm_arguments = parse_jvm_arguments(data=data, classpath=classpath)
 
         command = [
