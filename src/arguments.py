@@ -21,13 +21,13 @@ def parse_jvm_arguments(data: dict, classpath: List) -> List:
     classpath_str = pathsep.join(classpath)
 
     for arg in args:
-        arg_rules = arg.get('rules')
 
         if isinstance(arg, str):
             arg = populate_placeholders(arg, classpath_str)
             parsed_args.append(arg)
             continue
 
+        arg_rules = arg.get('rules')
         if arg_rules:
             allow = evalute_rules(arg_rules)
 
