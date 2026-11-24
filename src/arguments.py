@@ -44,14 +44,14 @@ def parse_jvm_arguments(data: dict, classpath: List) -> List:
             value = arg['value']
             if isinstance(value, list):
                 # <1.19 can have values as lists
-                parsed_args.append(populate_placeholders(item, classpath_str) for item in value)
+                parsed_args.extend(populate_placeholders(item, classpath_str) for item in value)
             else:
                 parsed_args.append(populate_placeholders(value, classpath_str))
             continue
 
     return parsed_args
 
-def prse_game_arguments(username: str, game_version: str, asset_index: str) -> List:
+def parse_game_arguments(username: str, game_version: str, asset_index: str) -> List:
     # Currently hardcoded arguments
     raw_uuid = hashlib.md5(f"OfflinePlayer:{username}".encode("utf-8")).digest()
     uuid = uid.UUID(bytes=raw_uuid, version=3).hex
