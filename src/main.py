@@ -8,13 +8,14 @@ from requests.exceptions import HTTPError
 import json
 import requests
 
-latest = "1.19"
+# Target version, I'm pretty sure this can only be a release, not a snapshot for now
+target = "26.3"
 
 all_versions = fetch_versions(options="all")
 
 # TODO: this logic should be in fetch_versions i think
 for version in all_versions:
-    if version["id"] == latest:
+    if version["id"] == target:
         try:
             # Open version manifest
             response = requests.get(version["url"])
