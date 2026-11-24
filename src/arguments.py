@@ -1,5 +1,5 @@
 from typing import List
-from utils import get_operating_system, get_system_architecture
+from rules import evalute_rules
 from os import pathsep
 from config import MC_DIR, NATIVES_DIR, ASSETS_DIR, LAUNCHER_NAME, LAUNCHER_VERSION
 import hashlib
@@ -21,24 +21,17 @@ def parse_jvm_arguments(data: dict, classpath: List) -> List:
     classpath_str = pathsep.join(classpath)
 
     for arg in args:
+        arg_rules = arg.get('rules')
+
         if isinstance(arg, str):
             arg = populate_placeholders(arg, classpath_str)
             parsed_args.append(arg)
             continue
 
-        # TODO: i need to actually process these rules properly holy fucking shit
-        if arg.get("rules"):
-            action = arg["rules"][0]["action"]
-            os = arg["rules"][0].get("os").get("name")
+        if arg_rules:
+            allow = evalute_rules(arg_rules)
 
-            # help i dont know what im doing
-            if not os:
-                os = arg["rules"][0].get("os").get("arch")
-                if os == "x86" or not os == get_system_architecture():
-                    continue
-
-            # If the argument isn't meant for our operating system, skip it
-            if not os == get_operating_system() and action == "allow" or os == get_operating_system() and action == "disallow":
+            if not allow:
                 continue
 
             value = arg['value']
