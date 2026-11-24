@@ -1,4 +1,5 @@
 from utils import download_file, create_requests_session, get_operating_system, get_system_architecture
+from rules import evalute_rules
 from pathlib import Path
 from java import extract_jar
 from concurrent.futures import ThreadPoolExecutor
@@ -41,13 +42,7 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
             return False
 
     if library_rules:
-        # Based on my analysis of the manifest, I'm pretty sure the only rules for the libraries are for the operating system
-        # Future me: This is mostly true for modern versions, but some versions before 1.19 also include other fields, I will work on this later.
-        action = library_rules[0]["action"]
-        os = library_rules[0]["os"]["name"]
-        # If the library isn't meant for our operating system, skip it
-        if not os == get_operating_system() and action == "allow":
-            return False
+        return evalute_rules(library_rules)
 
     return True
 
