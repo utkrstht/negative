@@ -44,16 +44,16 @@ def download_asset(asset_dict: dict, session: requests.Session) -> None:
         print(f"Something happened while downloading asset {asset_dict['url']}: {e}")
         return None
 
-def process_asset(session: requests.Session, asset: dict) -> None:
-    asset_hash = asset['hash']
+def process_asset(session: requests.Session, asset_hash: str) -> None:
     asset_dict = resolve_asset(asset_hash)
 
     download_asset(asset_dict, session)
 
 def download_assets(asset_index: str) -> None:
-    # TODO: deduplicate hashes before processing
     assets = json.loads(asset_index)['objects']
     session = create_requests_session()
 
+    unique_hashes = {asset['hash'] for asset in assets.values()}
+
     with ThreadPoolExecutor(max_workers=16) as executor:
-        list(executor.map(lambda asset: process_asset(session, asset), assets.values()))
+        list(executor.map(lambda asset: process_asset(session, asset), unique_hashes))
