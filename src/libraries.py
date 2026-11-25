@@ -51,6 +51,10 @@ def process_native_library(library: dict, session: requests.Session) -> None:
     library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
     library_natives = library.get('natives')
 
+    extract_rules = library.get('extract') or {}
+    exclusions = tuple(extract_rules.get('exclude') or ("META-INF/", ))
+
+    # Modern natives
     if 'native' in library_name:
         extract_jar(library_dir, NATIVES_DIR)   
 
@@ -73,9 +77,10 @@ def process_native_library(library: dict, session: requests.Session) -> None:
             except requests.RequestException as e:
                 print(f"Something happened while downloading native library {native_jar_url}: {e}")
 
-            extract_jar(native_jar_dir, NATIVES_DIR)
-
-
+            if exclusions:
+                extract_jar(native_jar_dir, NATIVES_DIR, exclude_prefixes=exclusions)
+            else:
+                extract_jar(native_jar_dir, NATIVES_DIR)
 
 def process_library(session: requests.Session, library: dict) -> str | None:
     library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
