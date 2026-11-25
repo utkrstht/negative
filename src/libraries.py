@@ -4,7 +4,7 @@ from pathlib import Path
 from java import extract_jar
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
-from config import MC_DIR
+from config import MC_DIR, NATIVES_DIR
 import requests
 
 def parse_library_name(library_name: str) -> dict:
@@ -46,10 +46,36 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
 
     return True
 
-def process_native_library(library_dir: Path) -> None:
-    natives_dir = MC_DIR / "natives"
+def process_native_library(library: dict, session: requests.Session) -> None:
+    library_name = library['name']
+    library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
+    library_natives = library.get('natives')
 
-    extract_jar(library_dir, natives_dir)
+    if 'native' in library_name:
+        extract_jar(library_dir, NATIVES_DIR)   
+
+    # For pre-1.19 manifests
+    if library_natives:
+        os = get_operating_system()
+        classifiers = library['downloads']['classifier']
+
+        # i'm sorry i dont know what to name these i'm sorry i really am 
+        native_classifier_name = library_natives.get(os)
+        if native_classifier_name:
+            native_classifier = classifiers.get(native_classifier_name)
+
+            native_jar_dir = MC_DIR / "libraries" / native_classifier["path"]
+            native_jar_url = native_classifier['url']
+            native_jar_hash = native_classifier['sha1']
+
+            try:
+                download_file(native_jar_url, native_jar_dir, native_jar_hash, session)
+            except requests.RequestException as e:
+                print(f"Something happened while downloading native library {native_jar_url}: {e}")
+
+            extract_jar(native_jar_dir, NATIVES_DIR)
+
+
 
 def process_library(session: requests.Session, library: dict) -> str | None:
     library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
@@ -67,8 +93,7 @@ def process_library(session: requests.Session, library: dict) -> str | None:
         print(f"Something happened while downloading library {library_name}: {e}")
         return None
 
-    if 'native' in library_name:
-        process_native_library(library_dir)
+    process_native_library(library, session)
 
     # This gets passed to classpath
     return str(library_dir)

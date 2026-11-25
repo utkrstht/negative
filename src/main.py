@@ -9,7 +9,7 @@ import json
 import requests
 
 # Target version, I'm pretty sure this can only be a release, not a snapshot for now
-target = "26.3"
+target = "1.18"
 
 all_versions = fetch_versions(options="all")
 
