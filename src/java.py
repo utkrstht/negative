@@ -1,23 +1,14 @@
 from pathlib import Path
 from zipfile import ZipFile
 from typing import List
-from config import MC_DIR
+from config import MC_DIR, NEGATIVE_DIR
 import jdk
 import sys
 import shutil
 import subprocess
 
 def get_java_dir() -> Path:
-    if sys.platform == "win32":
-        java = Path.home() / "AppData" / "Roaming" / ".negative" / "java"
-        
-    elif sys.platform == "darwin":
-        java = Path.home() / "Library" / "Application Support" / "negative" / "java"
-        
-    else:
-        java = Path.home() / ".negative" / "java"
-
-    return java
+    return NEGATIVE_DIR / "java"
 
 def get_java_exe(version: str, javaw: bool = True) -> Path | None:
     base = get_java_dir()
