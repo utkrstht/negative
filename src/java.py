@@ -44,14 +44,23 @@ def download_java(version: str) -> None:
     runtimes = get_java_dir()
     runtimes.mkdir(parents=True, exist_ok=True)
 
+    java_folder = None
     target_folder = runtimes / version
     if target_folder.exists():
         return
 
-    java_folder = jdk.install(version=version, jre=True, path=str(runtimes))
+    try: 
+        java_folder = jdk.install(version=version, jre=True, path=str(runtimes))
+    except jdk.JdkError as e:
+        print(f"Failed to install Java version {version} as JRE-only. Switching to downloading complete JDK")
+        try:
+            java_folder = jdk.install(version=version, jre=False, path=str(runtimes))
+        except jdk.JdkError as e:
+            print(f"Switching to JDK installation did not work: {e}")
 
     # Rename the folder to a known format for easy future access
-    shutil.move(java_folder, target_folder)
+    if java_folder:
+        shutil.move(java_folder, target_folder)
 
 def extract_jar(jar_path: Path, output_dir: Path, exclude_prefixes: tuple = ("META-INF/",)) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
