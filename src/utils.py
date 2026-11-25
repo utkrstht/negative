@@ -8,6 +8,7 @@ from requests.adapters import HTTPAdapter
 import sys
 import platform
 import shutil
+import struct
 import requests
 
 # This function follows the naming conventions that the manifest uses for operating systems
@@ -29,6 +30,9 @@ def get_system_architecture() -> str:
 
     # Meh.
     return platform.machine()
+
+def get_system_bitness() -> str:
+    return str(8 * struct.calcsize("P"))
 
 def get_minecraft_dir() -> Path:
     # It should point to .minecraft, but I don't want to corrupt my minecraft installation so it's going to .minecrafttest
