@@ -1,4 +1,4 @@
-from utils import download_file, create_requests_session, get_operating_system, get_system_architecture
+from utils import download_file, create_requests_session, get_operating_system, get_system_architecture, get_system_bitness
 from rules import evalute_rules
 from java import extract_jar
 from concurrent.futures import ThreadPoolExecutor
@@ -66,11 +66,15 @@ def process_native_library(library: dict, session: requests.Session) -> None:
     # For pre-1.19 manifests
     if library_natives:
         os = get_operating_system()
+        bitness = get_system_bitness()
         classifiers = library['downloads']['classifiers']
 
         # i'm sorry i dont know what to name these i'm sorry i really am 
         native_classifier_name = library_natives.get(os)
+        # Old manifests have natives seperated by system bitness
+        native_classifier_name = native_classifier_name.replace("${arch}", bitness)
         if native_classifier_name:
+
             native_classifier = classifiers.get(native_classifier_name)
 
             native_jar_dir = MC_DIR / "libraries" / native_classifier["path"]

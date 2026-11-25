@@ -8,8 +8,8 @@ from requests.exceptions import HTTPError
 import json
 import requests
 
-# Target version, I'm pretty sure this can only be a release, not a snapshot for now
-target = "1.8.9"
+# Target version (can be both a release and a snapshot)
+target = "26.4-pre-1"
 
 all_versions = fetch_versions(options="all")
 
