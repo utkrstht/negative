@@ -47,14 +47,20 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
 
 def process_native_library(library: dict, session: requests.Session) -> None:
     library_name = library['name']
-    library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
     library_natives = library.get('natives')
+
+    try:
+        # Library artifacts can be non-existent in some manifest (<1.12)
+        library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
+    except KeyError:
+        print("Library artifact does not exist")
+        library_dir = None
 
     extract_rules = library.get('extract') or {}
     exclusions = tuple(extract_rules.get('exclude') or ("META-INF/", ))
 
     # Modern natives
-    if 'native' in library_name:
+    if 'native' in library_name and library_dir:
         extract_jar(library_dir, NATIVES_DIR)   
 
     # For pre-1.19 manifests
@@ -82,25 +88,32 @@ def process_native_library(library: dict, session: requests.Session) -> None:
                 extract_jar(native_jar_dir, NATIVES_DIR)
 
 def process_library(session: requests.Session, library: dict) -> str | None:
-    library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
-    library_url = library["downloads"]["artifact"]["url"]
-    library_hash = library["downloads"]["artifact"]["sha1"]
-    library_name = library['name']
+    library_dir = None
 
-    if not should_i_download_this_library_on_my_pc(library):
-        # Not for our computer
-        return
+    if library['downloads'].get('artifact'):
+        # Library artifacts can be non-existent in some manifest (<1.12)
+        library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
+        library_url = library["downloads"]["artifact"]["url"]
+        library_hash = library["downloads"]["artifact"]["sha1"]
+        library_name = library['name']
 
-    try:
-        download_file(library_url, library_dir, library_hash, session)
-    except requests.RequestException as e:
-        print(f"Something happened while downloading library {library_name}: {e}")
-        return None
+        if not should_i_download_this_library_on_my_pc(library):
+            # Not for our computer
+            return
+
+        try:
+            download_file(library_url, library_dir, library_hash, session)
+        except requests.RequestException as e:
+            print(f"Something happened while downloading library {library_name}: {e}")
+            return None
 
     process_native_library(library, session)
 
     # This gets passed to classpath
-    return str(library_dir)
+    if library_dir:
+        return str(library_dir)
+    else:
+        return None
 
 def download_libraries(data: dict) -> List:
     libraries = data["libraries"]
