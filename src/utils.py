@@ -44,6 +44,16 @@ def get_minecraft_dir() -> Path:
         # Linux/Unix
         return Path.home() / ".minecrafttest"
 
+def get_negative_dir() -> Path:
+    if sys.platform == "win32":
+        return Path.home() / "AppData" / "Roaming" / ".negative" 
+        
+    elif sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / "negative" 
+        
+    else:
+        return Path.home() / ".negative"
+
 # Direct file stream
 def check_sha1_hashs(file: BufferedIOBase, hash: str) -> bool:
     file.seek(0)

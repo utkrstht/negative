@@ -12,7 +12,6 @@ def get_java_dir() -> Path:
         java = Path.home() / "AppData" / "Roaming" / ".negative" / "java"
         
     elif sys.platform == "darwin":
-        # No javaw here or down in linux because that's windows only
         java = Path.home() / "Library" / "Application Support" / "negative" / "java"
         
     else:
