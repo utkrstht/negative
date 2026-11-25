@@ -9,7 +9,7 @@ import json
 import requests
 
 # Target version (can be both a release and a snapshot)
-target = "26.4-pre-1"
+target = input("Please select your minecraft version (default: 26.3): ")
 
 all_versions = fetch_versions(options="all")
 
