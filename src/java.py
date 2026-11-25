@@ -1,7 +1,7 @@
 from pathlib import Path
 from zipfile import ZipFile
 from typing import List
-from config import MC_DIR, NEGATIVE_DIR
+from config import MC_DIR, NEGATIVE_DIR, MINECRAFT_LOG
 import jdk
 import sys
 import shutil
@@ -67,20 +67,22 @@ def extract_jar(jar_path: Path, output_dir: Path, exclude_prefixes: tuple = ("ME
 def launch_minecraft(command: List) -> int:
     print("Starting Minecraft")
 
-    # TODO: logging files
-    process = subprocess.Popen(
-        command,
-        cwd=MC_DIR,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        bufsize=1
-    )
+    with open(MINECRAFT_LOG, "w", encoding="utf-8") as f:
+        process = subprocess.Popen(
+            command,
+            cwd=MC_DIR,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1
+        )
 
-    if process.stdout is not None:
-        for line in process.stdout:
-            print(line, end="")
+        if process.stdout is not None:
+            for line in process.stdout:
+                print(line, end="")
+                f.write(line)
+                f.flush()
 
     return process.wait()
