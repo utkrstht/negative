@@ -1,6 +1,7 @@
 from config import MC_DIR
 from utils import check_sha1_hashf, download_file, create_requests_session
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
 import requests
 import json
 
@@ -55,4 +56,10 @@ def download_assets(asset_index: str) -> None:
     unique_hashes = {asset['hash'] for asset in assets.values()}
 
     with ThreadPoolExecutor(max_workers=16) as executor:
-        list(executor.map(lambda asset: process_asset(session, asset), unique_hashes))
+        futures = [
+            executor.submit(process_asset, session, asset)
+            for asset in unique_hashes
+        ]
+
+        for _ in tqdm(as_completed(futures), total=len(unique_hashes), desc="Processing assets", unit="asset"):
+            pass
