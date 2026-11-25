@@ -1,9 +1,10 @@
 from utils import download_file, create_requests_session, get_operating_system, get_system_architecture, get_system_bitness
 from rules import evalute_rules
 from java import extract_jar
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List
 from config import MC_DIR, NATIVES_DIR
+from tqdm import tqdm
 import requests
 
 def parse_library_name(library_name: str) -> dict:
@@ -126,10 +127,18 @@ def download_libraries(data: dict) -> List:
 
     session = create_requests_session()
 
-    with ThreadPoolExecutor(max_workers=16) as executor:
-        results = list(executor.map(lambda library: process_library(session, library), libraries))
-
     # Classpath JARs
-    jars = [path for path in results if path is not None]
+    jars = []
+
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        futures = [
+            executor.submit(process_library, session, library)
+            for library in libraries
+        ]
+
+        for future in tqdm(as_completed(futures), total=len(libraries), desc="Processing libraries", unit='lib'):
+            path = future.result()
+            if path is not None:
+                jars.append(path)
 
     return jars
