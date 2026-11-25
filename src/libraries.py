@@ -1,6 +1,5 @@
 from utils import download_file, create_requests_session, get_operating_system, get_system_architecture
 from rules import evalute_rules
-from pathlib import Path
 from java import extract_jar
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
