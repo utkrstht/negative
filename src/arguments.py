@@ -15,7 +15,21 @@ def populate_placeholders(arg: str, classpath: str) -> str:
     return arg
 
 def parse_jvm_arguments(data: dict, classpath: List) -> List:
-    args = data['arguments']['jvm']
+    classpath_str = pathsep.join(classpath)
+
+    try:
+        args = data['arguments']['jvm']
+    except KeyError:
+        # Super old versions do not provide JVM argumentss
+        print("Manifest does not provide JVM arguments, continuing with defaults")
+        default_jvm_args = [
+            '-Xmx2G',
+            '-Xms512M',
+            f'-Djava.library.path={NATIVES_DIR}',
+            "-cp",
+            classpath_str
+        ]
+        return default_jvm_args
 
     parsed_args = []
     classpath_str = pathsep.join(classpath)
