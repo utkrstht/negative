@@ -10,7 +10,7 @@ You can go into the Releases tab and select a binary for your operating system (
 Currently the binaries are hardcoded to launch the latest release of the game, which is, at time of writing is `26.3`
 You load into an offline-mode account named `krstht`.
 
-The launcher can launch all Minecraft versions after 1.18
+The launcher can launch all Minecraft versions.
 
 ## Contributing
 Good luck
