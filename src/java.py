@@ -67,6 +67,8 @@ def extract_jar(jar_path: Path, output_dir: Path, exclude_prefixes: tuple = ("ME
 def launch_minecraft(command: List) -> int:
     print("Starting Minecraft")
 
+    MINECRAFT_LOG.parent.mkdir(parents=True, exist_ok=True)
+    
     with open(MINECRAFT_LOG, "w", encoding="utf-8") as f:
         process = subprocess.Popen(
             command,
