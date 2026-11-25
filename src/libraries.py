@@ -61,7 +61,7 @@ def process_native_library(library: dict, session: requests.Session) -> None:
     # For pre-1.19 manifests
     if library_natives:
         os = get_operating_system()
-        classifiers = library['downloads']['classifier']
+        classifiers = library['downloads']['classifiers']
 
         # i'm sorry i dont know what to name these i'm sorry i really am 
         native_classifier_name = library_natives.get(os)
