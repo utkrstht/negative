@@ -74,8 +74,10 @@ def process_native_library(library: dict, session: requests.Session) -> None:
         # Old manifests have natives seperated by system bitness
         native_classifier_name = native_classifier_name.replace("${arch}", bitness)
         if native_classifier_name:
-
             native_classifier = classifiers.get(native_classifier_name)
+            if not native_classifier:
+                # The natives field doesn't exist for our operating system
+                return
 
             native_jar_dir = MC_DIR / "libraries" / native_classifier["path"]
             native_jar_url = native_classifier['url']
