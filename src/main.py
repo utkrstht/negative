@@ -11,6 +11,9 @@ import requests
 # Target version (can be both a release and a snapshot)
 target = input("Please select your minecraft version (default: 26.3): ")
 
+if not target:
+    target = "26.3"
+
 all_versions = fetch_versions(options="all")
 
 # TODO: this logic should be in fetch_versions i think
