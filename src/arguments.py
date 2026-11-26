@@ -1,7 +1,7 @@
 from typing import List
 from rules import evalute_rules
 from os import pathsep
-from config import MC_DIR, NATIVES_DIR, ASSETS_DIR, LAUNCHER_NAME, LAUNCHER_VERSION, SERVER_ADDRESS, SERVER_PORT
+from config import MC_DIR, NATIVES_DIR, ASSETS_DIR, LAUNCHER_NAME, LAUNCHER_VERSION
 import hashlib
 # Because otherwise this would cause naming conflicts
 import uuid as uid
@@ -72,7 +72,5 @@ def parse_game_arguments(username: str, game_version: str, asset_index: str) -> 
         "--accessToken", "0",
         "--clientId", "",
         "--xuid", "",
-        "--versionType", "release",
-        "--server", SERVER_ADDRESS,
-        "--port", str(SERVER_PORT)
+        "--versionType", "release"
     ]
