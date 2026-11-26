@@ -4,8 +4,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 import requests
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 def download_asset_index(data: dict) -> tuple | None:
+    logger.info("Downloading Asset Index")
     asset_index_id = data["assetIndex"]["id"]
     asset_index_dir = MC_DIR / "assets" / "indexes" / f"{asset_index_id}.json"
     asset_index_url = data["assetIndex"]["url"]
@@ -21,9 +25,10 @@ def download_asset_index(data: dict) -> tuple | None:
     try:
         download_file(asset_index_url, asset_index_dir, asset_index_hash)
     except requests.RequestException as e:
-        print(f"Something happened while downloading asset index: {e}")
+        logger.error(f"Something happened while downloading asset index: {e}")
         return None
 
+    logger.info("Downloaded asset index")
     return (asset_index_id, asset_index_dir)
 
 def resolve_asset(asset_hash: str) -> dict:
@@ -41,7 +46,7 @@ def download_asset(asset_dict: dict, session: requests.Session) -> None:
     try: 
         download_file(asset_dict['url'], asset_dict['local'], asset_dict['hash'], session)
     except requests.RequestException as e:
-        print(f"Something happened while downloading asset {asset_dict['url']}: {e}")
+        logger.error(f"Something happened while downloading asset {asset_dict['url']}: {e}")
         return None
 
 def process_asset(session: requests.Session, asset_hash: str) -> None:

@@ -49,7 +49,7 @@ def get_negative_dir() -> Path:
         return Path.home() / "AppData" / "Roaming" / ".negative" 
         
     elif sys.platform == "darwin":
-        return Path.home() / "Library" / "Application Support" / "negative" 
+        return Path.home() / "Library" / "Application Support" / "negative"
         
     else:
         return Path.home() / ".negative"

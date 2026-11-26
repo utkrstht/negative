@@ -47,17 +47,13 @@ for version in all_versions:
 
         download_version_manifest(version["id"], response)
 
-        logger.info("Downloading asset index")
         asset_index_id, asset_index_dir = download_asset_index(data)
-        logger.info("Downloaded asset index")
 
         classpath = download_libraries(data)
         classpath.append(str(jar_path))
 
-        logger.info("Downloading assets")
         with open(asset_index_dir, "r") as f:
             download_assets(f.read())
-        logger.info("Downloaded assets")
 
         download_java(java_version)
 
