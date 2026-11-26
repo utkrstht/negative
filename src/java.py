@@ -6,6 +6,9 @@ import jdk
 import sys
 import shutil
 import subprocess
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_java_dir() -> Path:
     return NEGATIVE_DIR / "java"
@@ -31,6 +34,7 @@ def get_java_exe(version: str, javaw: bool = True) -> Path | None:
     return None
 
 def download_java(version: str) -> None:
+    logger.info("Downloading Java")
     runtimes = get_java_dir()
     runtimes.mkdir(parents=True, exist_ok=True)
 
@@ -42,15 +46,16 @@ def download_java(version: str) -> None:
     try: 
         java_folder = jdk.install(version=version, jre=True, path=str(runtimes))
     except jdk.JdkError as e:
-        print(f"Failed to install Java version {version} as JRE-only. Switching to downloading complete JDK")
+        logger.warning(f"Failed to install Java version {version} as JRE-only. Switching to downloading complete JDK")
         try:
             java_folder = jdk.install(version=version, jre=False, path=str(runtimes))
         except jdk.JdkError as e:
-            print(f"Switching to JDK installation did not work: {e}")
+            logger.error(f"Switching to JDK installation did not work: {e}")
 
     # Rename the folder to a known format for easy future access
     if java_folder:
         shutil.move(java_folder, target_folder)
+        logger.info("Downloaded Java")
 
 def extract_jar(jar_path: Path, output_dir: Path, exclude_prefixes: tuple = ("META-INF/",)) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -65,7 +70,7 @@ def extract_jar(jar_path: Path, output_dir: Path, exclude_prefixes: tuple = ("ME
 
 # I'll probably shift this to somewhere else
 def launch_minecraft(command: List) -> int:
-    print("Starting Minecraft")
+    logger.info("Starting Minecraft")
 
     MINECRAFT_LOG.parent.mkdir(parents=True, exist_ok=True)
     
@@ -87,4 +92,7 @@ def launch_minecraft(command: List) -> int:
                 f.write(line)
                 f.flush()
 
-    return process.wait()
+    exit_code = process.wait()
+
+    logger.info(f"Minecraft exited with {exit_code}")
+    return exit_code
