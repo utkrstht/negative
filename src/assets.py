@@ -55,6 +55,7 @@ def process_asset(session: requests.Session, asset_hash: str) -> None:
     download_asset(asset_dict, session)
 
 def download_assets(asset_index: str) -> None:
+    logger.info("Downloading Assets")
     assets = json.loads(asset_index)['objects']
     session = create_requests_session()
 
@@ -67,4 +68,6 @@ def download_assets(asset_index: str) -> None:
         ]
 
         for _ in tqdm(as_completed(futures), total=len(unique_hashes), desc="Processing assets", unit="asset"):
-            pass
+            pass    
+
+    logger.info("Downloaded Assets")
