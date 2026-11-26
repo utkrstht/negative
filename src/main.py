@@ -4,9 +4,21 @@ from assets import download_asset_index, download_assets
 from libraries import download_libraries
 from java import download_java, get_java_exe, launch_minecraft
 from arguments import parse_game_arguments, parse_jvm_arguments
+from config import LAUNCHER_LOG
 from requests.exceptions import HTTPError
 import json
 import requests
+import logging
+
+# Setup launcher logger
+logging.basicConfig(level=logging.INFO, 
+                    format="[%(asctime)s] [%(name)s] %(levelname)s: %(message)s",
+                    handlers=[
+                        logging.FileHandler(LAUNCHER_LOG),
+                        logging.StreamHandler()
+                    ])
+
+logger = logging.getLogger(__name__)
 
 # Target version (can be both a release and a snapshot)
 target = input("Please select your minecraft version (default: 26.3): ") or "26.3"
@@ -22,40 +34,40 @@ for version in all_versions:
             response = requests.get(version["url"])
             response.raise_for_status()
         except HTTPError as e:
-            print(f"Something happened when fetching version-specific manifest: {e}")
+            logger.error(f"Something happened when fetching version-specific manifest: {e}")
 
         data = json.loads(response.text)
         try:
             java_version = str(data['javaVersion']['majorVersion'])
         except KeyError:
-            print("Manifest does not provide javaVersion, defaulting to Java 8")
+            logger.warning("Manifest does not provide javaVersion, defaulting to Java 8")
             java_version = "8"
 
-        print("Downloading client JAR")
+        logger.info("Downloading client JAR")
         jar_path = download_version_jar(version["id"], data)
-        print("Downloaded client JAR")
+        logger.info("Downloaded client JAR")
 
-        print("Downloading version manifest")
+        logger.info("Downloading version manifest")
         download_version_manifest(version["id"], response)
-        print("Downloaded version manifest")
+        logger.info("Downloaded version manifest")
 
-        print("Downloading asset index")
+        logger.info("Downloading asset index")
         asset_index_id, asset_index_dir = download_asset_index(data)
-        print("Downloaded asset index")
+        logger.info("Downloaded asset index")
 
-        print("Downloading libraries")
+        logger.info("Downloading libraries")
         classpath = download_libraries(data)
         classpath.append(str(jar_path))
-        print("Downloaded libraries")
+        logger.info("Downloaded libraries")
 
-        print("Downloading assets")
+        logger.info("Downloading assets")
         with open(asset_index_dir, "r") as f:
             download_assets(f.read())
-        print("Downloaded assets")
+        logger.info("Downloaded assets")
 
-        print("Downloading Java")
+        logger.info("Downloading Java")
         download_java(java_version)
-        print("Downloaded Java")
+        logger.info("Downloaded Java")
 
         java_path = get_java_exe(version=java_version, javaw=True)
         main_class = data['mainClass']
@@ -72,5 +84,5 @@ for version in all_versions:
 
         exit_code = launch_minecraft(command=command)
 
-        print("Minecraft exited with ", exit_code)
+        logger.info(f"Minecraft exited with {exit_code}")
         break
