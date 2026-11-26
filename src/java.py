@@ -2,6 +2,7 @@ from pathlib import Path
 from zipfile import ZipFile
 from typing import List
 from config import MC_DIR, NEGATIVE_DIR, MINECRAFT_LOG
+from utils import get_operating_system
 import jdk
 import sys
 import shutil
@@ -38,19 +39,28 @@ def download_java(version: str) -> None:
     runtimes = get_java_dir()
     runtimes.mkdir(parents=True, exist_ok=True)
 
+    os = get_operating_system
+
     java_folder = None
     target_folder = runtimes / version
     if target_folder.exists():
         return
 
     try: 
-        java_folder = jdk.install(version=version, jre=True, path=str(runtimes))
+        if os == "osx":
+            logger.info("Switching vendor to Azul Zulu for Java because user OS is OSX")
+            java_folder = jdk.install(version=version, jre=True, path=str(runtimes), vendor='zulu')
+        else:
+            java_folder = jdk.install(version=version, jre=True, path=str(runtimes))
     except jdk.JdkError as e:
         logger.warning(f"Failed to install Java version {version} as JRE-only. Switching to downloading complete JDK")
         try:
-            java_folder = jdk.install(version=version, jre=False, path=str(runtimes))
+            if os == "osx":
+                java_folder = jdk.install(version=version, jre=True, path=str(runtimes), vendor='zulu')
+            else:
+                java_folder = jdk.install(version=version, jre=False, path=str(runtimes))
         except jdk.JdkError as e:
-            logger.error(f"Switching to JDK installation did not work: {e}")
+            logger.warning(f"Switching to JDK installation did not work: {e}")
 
     # Rename the folder to a known format for easy future access
     if java_folder:

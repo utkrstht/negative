@@ -36,30 +36,41 @@ for version in all_versions:
         except HTTPError as e:
             logger.error(f"Something happened when fetching version-specific manifest: {e}")
 
+        # Load manifest
         data = json.loads(response.text)
+
+        # Try getting the Java version, if it fails, default to Java 8 (because it usually only happens with older versions)
         try:
             java_version = str(data['javaVersion']['majorVersion'])
         except KeyError:
             logger.warning("Manifest does not provide javaVersion, defaulting to Java 8")
             java_version = "8"
 
+        # Get the client JAR
         jar_path = download_version_jar(version["id"], data)
 
+        # Get the version manifest
         download_version_manifest(version["id"], response)
 
+        # Download asset index and get 
         asset_index_id, asset_index_dir = download_asset_index(data)
 
+        # Get the classpath and add the client JAR to it
         classpath = download_libraries(data)
         classpath.append(str(jar_path))
 
+        # Download assets from asset index
         with open(asset_index_dir, "r") as f:
             download_assets(f.read())
 
+        # Download Java
         download_java(java_version)
 
+        # Get Java executable
         java_path = get_java_exe(version=java_version, javaw=True)
         main_class = data['mainClass']
 
+        # Get the arguments for JVM and minecraft
         game_arguments = parse_game_arguments(username=username, game_version=target, asset_index=asset_index_id)
         jvm_arguments = parse_jvm_arguments(data=data, classpath=classpath)
 
@@ -70,5 +81,6 @@ for version in all_versions:
             *game_arguments
         ]
 
+        # Launch
         exit_code = launch_minecraft(command=command)
         break
