@@ -27,7 +27,11 @@ for version in all_versions:
             print(f"Something happened when fetching version-specific manifest: {e}")
 
         data = json.loads(response.text)
-        java_version = str(data['javaVersion']['majorVersion'])
+        try:
+            java_version = str(data['javaVersion']['majorVersion'])
+        except KeyError:
+            print("Manifest does not provide javaVersion, defaulting to Java 8")
+            java_version = "8"
         
         print("Downloading client JAR")
         jar_path = download_version_jar(version["id"], data)
@@ -55,7 +59,7 @@ for version in all_versions:
         download_java(java_version)
         print("Downloaded Java")
 
-        java_path = get_java_exe(version=str(data['javaVersion']['majorVersion']), javaw=False)
+        java_path = get_java_exe(version=java_version, javaw=False)
         main_class = data['mainClass']
 
         game_arguments = parse_game_arguments(username="krstht", game_version=target, asset_index=asset_index_id)
