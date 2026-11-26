@@ -9,10 +9,8 @@ import json
 import requests
 
 # Target version (can be both a release and a snapshot)
-target = input("Please select your minecraft version (default: 26.3): ")
-
-if not target:
-    target = "26.3"
+target = input("Please select your minecraft version (default: 26.3): ") or "26.3"
+username = input("Please enter your username: ") or "TestPlayer"
 
 all_versions = fetch_versions(options="all")
 
@@ -32,7 +30,7 @@ for version in all_versions:
         except KeyError:
             print("Manifest does not provide javaVersion, defaulting to Java 8")
             java_version = "8"
-        
+
         print("Downloading client JAR")
         jar_path = download_version_jar(version["id"], data)
         print("Downloaded client JAR")
@@ -59,10 +57,10 @@ for version in all_versions:
         download_java(java_version)
         print("Downloaded Java")
 
-        java_path = get_java_exe(version=java_version, javaw=False)
+        java_path = get_java_exe(version=java_version, javaw=True)
         main_class = data['mainClass']
 
-        game_arguments = parse_game_arguments(username="krstht", game_version=target, asset_index=asset_index_id)
+        game_arguments = parse_game_arguments(username=username, game_version=target, asset_index=asset_index_id)
         jvm_arguments = parse_jvm_arguments(data=data, classpath=classpath)
 
         command = [
