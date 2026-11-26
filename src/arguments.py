@@ -5,6 +5,9 @@ from config import MC_DIR, NATIVES_DIR, ASSETS_DIR, LAUNCHER_NAME, LAUNCHER_VERS
 import hashlib
 # Because otherwise this would cause naming conflicts
 import uuid as uid
+import logging
+
+logger = logging.getLogger(__name__)
 
 def populate_placeholders(arg: str, classpath: str) -> str:
     arg = arg.replace("${natives_directory}", str(NATIVES_DIR))
@@ -21,7 +24,7 @@ def parse_jvm_arguments(data: dict, classpath: List) -> List:
         args = data['arguments']['jvm']
     except KeyError:
         # Super old versions do not provide JVM argumentss
-        print("Manifest does not provide JVM arguments, continuing with defaults")
+        logger.warning("Manifest does not provide JVM arguments, continuing with defaults")
         default_jvm_args = [
             '-Xmx2G',
             '-Xms512M',
