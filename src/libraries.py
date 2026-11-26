@@ -6,6 +6,9 @@ from typing import List
 from config import MC_DIR, NATIVES_DIR
 from tqdm import tqdm
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 def parse_library_name(library_name: str) -> dict:
     parts = library_name.split(":")
@@ -54,7 +57,7 @@ def process_native_library(library: dict, session: requests.Session) -> None:
         # Library artifacts can be non-existent in some manifest (<1.12)
         library_dir = MC_DIR / "libraries" / library["downloads"]["artifact"]["path"]
     except KeyError:
-        print("Library artifact does not exist")
+        logger.warning(f"Library {library_name} artifact does not exist")
         library_dir = None
 
     extract_rules = library.get('extract') or {}
@@ -87,7 +90,7 @@ def process_native_library(library: dict, session: requests.Session) -> None:
             try:
                 download_file(native_jar_url, native_jar_dir, native_jar_hash, session)
             except requests.RequestException as e:
-                print(f"Something happened while downloading native library {native_jar_url}: {e}")
+                logger.error(f"Something happened while downloading native library {native_jar_url}: {e}")
 
             if exclusions:
                 extract_jar(native_jar_dir, NATIVES_DIR, exclude_prefixes=exclusions)
@@ -111,7 +114,7 @@ def process_library(session: requests.Session, library: dict) -> str | None:
         try:
             download_file(library_url, library_dir, library_hash, session)
         except requests.RequestException as e:
-            print(f"Something happened while downloading library {library_name}: {e}")
+            logger.error(f"Something happened while downloading library {library_name}: {e}")
             return None
 
     process_native_library(library, session)
