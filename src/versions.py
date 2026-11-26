@@ -5,6 +5,9 @@ from utils import download_file
 from pathlib import Path
 import requests
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 # TODO: cache the manifest
 def fetch_versions(options: str = "latest_release") -> str | dict:
@@ -13,7 +16,7 @@ def fetch_versions(options: str = "latest_release") -> str | dict:
         response = requests.get(MANIFEST_URL)
         response.raise_for_status() 
     except HTTPError as e:
-        print(f"Something happened while fetching version manifest: {e.response.text}") 
+        logger.error(f"Something happened while fetching version manifest: {e.response.text}") 
         return None
 
     data = json.loads(response.text)
@@ -27,6 +30,7 @@ def fetch_versions(options: str = "latest_release") -> str | dict:
         return data["versions"]
 
 def download_version_jar(version: str, data: dict) -> Path | None:
+    logger.info("Downloading client JAR")
     jar_url = data["downloads"]["client"]["url"]
     jar_hash = data["downloads"]["client"]["sha1"]
     # C:\Users\User\AppData\Roaming\.minecraft\version\version.jar
@@ -35,14 +39,18 @@ def download_version_jar(version: str, data: dict) -> Path | None:
     try:
         download_file(jar_url, jar_dir, jar_hash)
     except requests.RequestException as e:
-        print(f"Something happened while downloading client jar: {e}")
+        logger.error(f"Something happened while downloading client jar: {e}")
         return None
 
+    logger.info("Downloaded client JAR")
     return jar_dir
 
 def download_version_manifest(version: str, response: requests.Response) -> None:
+    logger.info("Downloading version manifest")
     jar_manifest_dir = MC_DIR / "versions" / version / f"{version}.json"
 
     # No checks on this one because this IS the source of truth
     with open(jar_manifest_dir, 'w') as f:
         f.write(response.text)
+
+    logger.info("Downloaded version manifest")

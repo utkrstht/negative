@@ -43,13 +43,9 @@ for version in all_versions:
             logger.warning("Manifest does not provide javaVersion, defaulting to Java 8")
             java_version = "8"
 
-        logger.info("Downloading client JAR")
         jar_path = download_version_jar(version["id"], data)
-        logger.info("Downloaded client JAR")
 
-        logger.info("Downloading version manifest")
         download_version_manifest(version["id"], response)
-        logger.info("Downloaded version manifest")
 
         logger.info("Downloading asset index")
         asset_index_id, asset_index_dir = download_asset_index(data)
