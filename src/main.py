@@ -51,19 +51,15 @@ for version in all_versions:
         asset_index_id, asset_index_dir = download_asset_index(data)
         logger.info("Downloaded asset index")
 
-        logger.info("Downloading libraries")
         classpath = download_libraries(data)
         classpath.append(str(jar_path))
-        logger.info("Downloaded libraries")
 
         logger.info("Downloading assets")
         with open(asset_index_dir, "r") as f:
             download_assets(f.read())
         logger.info("Downloaded assets")
 
-        logger.info("Downloading Java")
         download_java(java_version)
-        logger.info("Downloaded Java")
 
         java_path = get_java_exe(version=java_version, javaw=True)
         main_class = data['mainClass']
@@ -79,6 +75,4 @@ for version in all_versions:
         ]
 
         exit_code = launch_minecraft(command=command)
-
-        logger.info(f"Minecraft exited with {exit_code}")
         break

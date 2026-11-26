@@ -126,6 +126,7 @@ def process_library(session: requests.Session, library: dict) -> str | None:
         return None
 
 def download_libraries(data: dict) -> List:
+    logger.info("Downloading Libraries")
     libraries = data["libraries"]
 
     session = create_requests_session()
@@ -144,4 +145,5 @@ def download_libraries(data: dict) -> List:
             if path is not None:
                 jars.append(path)
 
+    logger.info("Downloaded Libraries")
     return jars
