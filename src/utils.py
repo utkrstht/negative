@@ -37,12 +37,12 @@ def get_system_bitness() -> str:
 def get_minecraft_dir() -> Path:
     # It should point to .minecraft, but I don't want to corrupt my minecraft installation so it's going to .minecrafttest
     if sys.platform == "win32":
-        return Path.home() / "AppData" / "Roaming" / ".minecrafttest"
+        return Path.home() / "AppData" / "Roaming" / ".minecraft"
     elif sys.platform == "darwin":
-        return Path.home() / "Library" / "Application Support" / "minecrafttest"
+        return Path.home() / "Library" / "Application Support" / "minecraft"
     else:
         # Linux/Unix
-        return Path.home() / ".minecrafttest"
+        return Path.home() / ".minecraft"
 
 def get_negative_dir() -> Path:
     if sys.platform == "win32":
