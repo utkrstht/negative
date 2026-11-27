@@ -63,6 +63,7 @@ def download_optifine(minecraft_version: str) -> Path:
 def install_optifine(optifine_jar: Path, java_exe: Path) -> None:
     logger.info("Starting Optifine Installer")
 
+    # I think I should have another log for optifine but mmm meh
     with open(LAUNCHER_LOG, "w") as f:
         process = subprocess.Popen(
             [java_exe, optifine_jar],
@@ -79,3 +80,7 @@ def install_optifine(optifine_jar: Path, java_exe: Path) -> None:
                 logger.info(line)
                 f.write(line)
                 f.flush()
+
+        exit_code = process.wait()
+
+    logger.info(f"Optifine Installer exited with code: {exit_code}")
