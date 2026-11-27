@@ -9,6 +9,11 @@ NEGATIVE_DIR = get_negative_dir()
 
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
+BMCLAPI_OPTIFINE_VERSION_LIST_URL = "https://bmclapi2.bangbang93.com/optifine/:mcversion"
+BMCLAPI_OPTIFINE_VERSION_LIST_DIR = NEGATIVE_DIR / "cache" / "optifine"
+BMCLAPI_OPTIFINE_DOWNLOAD_URL = "https://bmclapi2.bangbang93.com/optifine/:mcversion/:type/:patch"
+BMCLAPI_OPTIFINE_DOWNLOAD_DIR = NEGATIVE_DIR / "cache" / "optifine" / "jars"
+
 LAUNCHER_NAME = "Negative"
 LAUNCHER_VERSION = "v0.2.0"
 
