@@ -1,4 +1,4 @@
-from config import BMCLAPI_OPTIFINE_VERSION_LIST_URL, BMCLAPI_OPTIFINE_DOWNLOAD_DIR, BMCLAPI_OPTIFINE_DOWNLOAD_URL, NEGATIVE_DIR, LAUNCHER_LOG
+from config import BMCLAPI_OPTIFINE_VERSION_LIST_URL, BMCLAPI_OPTIFINE_DOWNLOAD_DIR, BMCLAPI_OPTIFINE_DOWNLOAD_URL, NEGATIVE_DIR, LAUNCHER_LOG, MC_DIR
 from utils import download_file
 from pathlib import Path
 import requests
@@ -85,3 +85,24 @@ def install_optifine(optifine_jar: Path, java_exe: Path) -> None:
         exit_code = process.wait()
 
     logger.info(f"Optifine Installer exited with code: {exit_code}")
+
+# No it doesn't actually do anything to optifine
+def patch_optifine() -> None:
+    launcher_profile = MC_DIR / "launcher_profile.json"
+    launcher_profile2 = MC_DIR / "launcher_profile_microsoft_store.json"
+
+    if launcher_profile.exists() and launcher_profile2.exists():
+        return
+
+    logger.info("Patching Optifine Checks")
+
+    profiles = {
+        "profiles": {},
+        "selectedProfile": "",
+    }
+
+    with open(launcher_profile, "w", encoding="utf-8") as f:
+        json.dump(profiles, f, indents=2)
+
+    with open(launcher_profile2, "w", encoding="utf-8") as f:
+        json.dump(profiles, f, indents=2)

@@ -4,7 +4,7 @@ from assets import download_asset_index, download_assets
 from libraries import download_libraries
 from java import download_java, get_java_exe, launch_minecraft
 from arguments import parse_game_arguments, parse_jvm_arguments
-from optifine import download_optifine, install_optifine
+from optifine import download_optifine, install_optifine, patch_optifine
 from config import LAUNCHER_LOG
 from requests.exceptions import HTTPError
 import json
@@ -61,9 +61,11 @@ for version in all_versions:
 
         if use_optifine:
             optifine_path = download_optifine(version["id"])
+            # Make optifine happy like the loyal pet dog it is to microsoft 
+            patch_optifine()
             # Run optifine installer
             install_optifine(optifine_jar=optifine_path, java_exe=java_path)
-            
+
         # Get the client JAR
         jar_path = download_version_jar(version["id"], data)
 
