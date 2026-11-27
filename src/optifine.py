@@ -1,8 +1,9 @@
-from config import BMCLAPI_OPTIFINE_VERSION_LIST_URL, BMCLAPI_OPTIFINE_DOWNLOAD_DIR, BMCLAPI_OPTIFINE_DOWNLOAD_URL
+from config import BMCLAPI_OPTIFINE_VERSION_LIST_URL, BMCLAPI_OPTIFINE_DOWNLOAD_DIR, BMCLAPI_OPTIFINE_DOWNLOAD_URL, NEGATIVE_DIR, LAUNCHER_LOG
 from utils import download_file
 from pathlib import Path
 import requests
 import logging
+import subprocess
 import json
 
 logger = logging.getLogger(__name__)
@@ -55,5 +56,26 @@ def download_optifine(minecraft_version: str) -> Path:
         logger.exception("Something happened while trying to download optifine")
         raise
 
+    logger.info("Downloaded Optifine")
     return bmclapi_optifine_download_path
 
+# This only runs the installer
+def install_optifine(optifine_jar: Path, java_exe: Path) -> None:
+    logger.info("Starting Optifine Installer")
+
+    with open(LAUNCHER_LOG, "w") as f:
+        process = subprocess.Popen(
+            [java_exe, optifine_jar],
+            cwd=NEGATIVE_DIR,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1)
+
+        if process.stdout is not None:
+            for line in process.stdout:
+                logger.info(line)
+                f.write(line)
+                f.flush()
