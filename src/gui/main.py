@@ -18,11 +18,16 @@ import tkinter as tk
 import ctypes
 ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
+disable_icons = False
+
 ASSETS_DIR = Path.absolute(Path("assets/"))
 # 70x60
-GITHUB_ICON = Image.open(ASSETS_DIR / "github.png")
-SETTINGS_ICON = Image.open(ASSETS_DIR / "settings.png")
-CREDITS_ICON = Image.open(ASSETS_DIR / "credits.png")
+if not ASSETS_DIR.exists():
+    disable_icons = True
+else:
+    GITHUB_ICON = Image.open(ASSETS_DIR / "github.png")
+    SETTINGS_ICON = Image.open(ASSETS_DIR / "settings.png")
+    CREDITS_ICON = Image.open(ASSETS_DIR / "credits.png")
 
 class Main:
     def __init__(self, root):
@@ -36,32 +41,33 @@ class Main:
         self.l_title = tk.Label(root, text="negative", font=("Helvetica", 70, "italic"))
         self.l_title.place(x=205, y=130, width=390, height=140)
 
-        self.b_settings = tk.Button(root, text="", command=self.on_b_settings, font=("Helvetica", 12, "italic"))
+        self.b_settings = tk.Button(root, text="Settings" if disable_icons else "", command=self.open_settings, font=("Helvetica", 12, "italic"))
         self.b_settings.place(x=30, y=510, width=90, height=70)
 
         self.b_sep = ttk.Separator(root, orient="horizontal")
         self.b_sep.place(x=70, y=470, width=660, height=20)
 
-        self.b_source = tk.Button(root, text="", command=self.on_b_source, font=("Helvetica", 12, "italic"))
+        self.b_source = tk.Button(root, text="Source" if disable_icons else "", command=self.on_b_source, font=("Helvetica", 12, "italic"))
         self.b_source.place(x=680, y=510, width=90, height=70)
 
         self.l_version = tk.Label(root, text="v0.2.0", font=("Helvetica", 12))
         self.l_version.place(x=745, y=0, width=50, height=20)
 
-        self.b_credits = tk.Button(root, text="", command=self.on_b_credits, font=("Helvetica", 12, "italic"))
+        self.b_credits = tk.Button(root, text="Credits" if disable_icons else "", command=self.open_credits, font=("Helvetica", 12, "italic"))
         self.b_credits.place(x=570, y=510, width=90, height=70)
 
-        self.i_settings_image = ImageTk.PhotoImage(SETTINGS_ICON)
-        self.i_settings = tk.Label(root, image=self.i_settings_image)
-        self.i_settings.place(x=40, y=515, width=70, height=60)
+        if not disable_icons:
+            self.i_settings_image = ImageTk.PhotoImage(SETTINGS_ICON)
+            self.i_settings = tk.Label(root, image=self.i_settings_image)
+            self.i_settings.place(x=40, y=515, width=70, height=60)
 
-        self.i_credits_image = ImageTk.PhotoImage(CREDITS_ICON)
-        self.i_credits = tk.Label(root, image=self.i_credits_image)
-        self.i_credits.place(x=580, y=515, width=70, height=60)
+            self.i_credits_image = ImageTk.PhotoImage(CREDITS_ICON)
+            self.i_credits = tk.Label(root, image=self.i_credits_image)
+            self.i_credits.place(x=580, y=515, width=70, height=60)
 
-        self.i_source_image = ImageTk.PhotoImage(GITHUB_ICON)
-        self.i_source = tk.Label(root, image=self.i_source_image)
-        self.i_source.place(x=690, y=515, width=70, height=60)
+            self.i_source_image = ImageTk.PhotoImage(GITHUB_ICON)
+            self.i_source = tk.Label(root, image=self.i_source_image)
+            self.i_source.place(x=690, y=515, width=70, height=60)
 
     def open_settings(self):
         return Settings(self.root)
