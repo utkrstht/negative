@@ -1,5 +1,5 @@
 from utils import download_file, create_requests_session, get_operating_system, get_system_architecture, get_system_bitness
-from rules import evalute_rules
+from rules import evalute_minecraft_manifest_rules
 from java import extract_jar
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List
@@ -45,7 +45,7 @@ def should_i_download_this_library_on_my_pc(library: dict) -> bool:
             return False
 
     if library_rules:
-        return evalute_rules(library_rules)
+        return evalute_minecraft_manifest_rules(library_rules)
 
     return True
 

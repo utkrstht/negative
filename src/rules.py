@@ -1,6 +1,6 @@
 from utils import get_operating_system, get_system_architecture
 
-def evalute_rules(rules: list) -> bool:
+def evalute_minecraft_manifest_rules(rules: list) -> bool:
     allow = False
 
     sys_os = get_operating_system()

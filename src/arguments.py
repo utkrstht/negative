@@ -1,5 +1,5 @@
 from typing import List
-from rules import evalute_rules
+from rules import evalute_minecraft_manifest_rules
 from os import pathsep
 from config import MC_DIR, NATIVES_DIR, ASSETS_DIR, LAUNCHER_NAME, LAUNCHER_VERSION
 import hashlib
@@ -45,7 +45,7 @@ def parse_jvm_arguments(data: dict, classpath: List) -> List:
 
         arg_rules = arg.get('rules')
         if arg_rules:
-            allow = evalute_rules(arg_rules)
+            allow = evalute_minecraft_manifest_rules(arg_rules)
 
             if not allow:
                 continue
