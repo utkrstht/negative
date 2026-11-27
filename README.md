@@ -11,7 +11,7 @@ clone
 get in folder  
 `cd negative`  
 
-install deps  
+install deps (you need python 3.11+)
 `pip install -r requirements.txt`
 
 run  
