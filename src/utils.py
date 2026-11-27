@@ -111,6 +111,7 @@ def download_file(file_url: str, file_dir: str | Path, file_hash: str = "", sess
                     file_dir.parent.mkdir(parents=True, exist_ok=True)
 
                     with open(file_dir, "wb") as f:
+                        t.seek(0)
                         shutil.copyfileobj(t, f)
 
 
