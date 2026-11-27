@@ -58,6 +58,7 @@ def get_negative_dir() -> Path:
 def check_sha1_hashs(file: BufferedIOBase, hash: str) -> bool:
     # TODO: if hash is empty, return True
     if not hash:
+        file.seek(0)
         return True
     
     file.seek(0)
