@@ -1,5 +1,6 @@
 from config import BMCLAPI_OPTIFINE_VERSION_LIST_URL, BMCLAPI_OPTIFINE_DOWNLOAD_DIR, BMCLAPI_OPTIFINE_DOWNLOAD_URL
 from utils import download_file
+from pathlib import Path
 import requests
 import logging
 import json
@@ -23,7 +24,7 @@ def which_optifine_version_should_i_download_for_my_minecraft_version(optifine_e
 
     return latest_optifine
 
-def download_optifine(minecraft_version: str) -> None:
+def download_optifine(minecraft_version: str) -> Path:
     logger.info(f"Downloading Optifine for Minecraft {minecraft_version}")
     # The URL template is customizable so yeah
     bmclapi_optifine_version_list_url = str(BMCLAPI_OPTIFINE_VERSION_LIST_URL).replace(":mcversion", minecraft_version)
@@ -52,4 +53,7 @@ def download_optifine(minecraft_version: str) -> None:
         download_file(bmclapi_optifine_download_url, bmclapi_optifine_download_path)
     except requests.RequestException:
         logger.exception("Something happened while trying to download optifine")
-        
+        raise
+
+    return bmclapi_optifine_download_path
+
