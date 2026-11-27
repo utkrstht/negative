@@ -66,7 +66,8 @@ def install_optifine(optifine_jar: Path, java_exe: Path) -> None:
     # I think I should have another log for optifine but mmm meh
     with open(LAUNCHER_LOG, "w") as f:
         process = subprocess.Popen(
-            [java_exe, optifine_jar],
+            [java_exe, 
+             "-jar", optifine_jar],
             cwd=NEGATIVE_DIR,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
