@@ -15,8 +15,6 @@ from play import Play
 import tkinter as tk
 
 #### me code :> this makes the window render look better 
-import ctypes
-ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
 disable_icons = False
 
@@ -35,7 +33,7 @@ class Main:
         root.title("Main")
         root.geometry("800x600")
 
-        self.b_start = tk.Button(root, text="Start", command=self.on_b_start, font=("Helvetica", 18, "italic"))
+        self.b_start = tk.Button(root, text="Start", command=self.open_play, font=("Helvetica", 18, "italic"))
         self.b_start.place(x=250, y=350, width=300, height=50)
 
         self.l_title = tk.Label(root, text="negative", font=("Helvetica", 70, "italic"))
@@ -89,3 +87,8 @@ class Main:
 
     def on_b_credits(self):
         pass
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = Main(root)
+    root.mainloop()
