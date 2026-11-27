@@ -6,6 +6,7 @@
 
 from tkinter import ttk
 from PIL import Image, ImageTk
+from pathlib import Path
 
 from settings import Settings
 from credits import Credits
@@ -16,6 +17,12 @@ import tkinter as tk
 #### me code :> this makes the window render look better 
 import ctypes
 ctypes.windll.shcore.SetProcessDpiAwareness(True)
+
+ASSETS_DIR = Path.absolute(Path("assets/"))
+# 70x60
+GITHUB_ICON = Image.open(ASSETS_DIR / "github.png")
+SETTINGS_ICON = Image.open(ASSETS_DIR / "settings.png")
+CREDITS_ICON = Image.open(ASSETS_DIR / "credits.png")
 
 class Main:
     def __init__(self, root):
@@ -44,15 +51,15 @@ class Main:
         self.b_credits = tk.Button(root, text="", command=self.on_b_credits, font=("Helvetica", 12, "italic"))
         self.b_credits.place(x=570, y=510, width=90, height=70)
 
-        self.i_settings_image = ImageTk.PhotoImage(Image.open("settings.png").resize((70, 60)))
+        self.i_settings_image = ImageTk.PhotoImage(SETTINGS_ICON)
         self.i_settings = tk.Label(root, image=self.i_settings_image)
         self.i_settings.place(x=40, y=515, width=70, height=60)
 
-        self.i_credits_image = ImageTk.PhotoImage(Image.open("credits.png").resize((70, 60)))
+        self.i_credits_image = ImageTk.PhotoImage(CREDITS_ICON)
         self.i_credits = tk.Label(root, image=self.i_credits_image)
         self.i_credits.place(x=580, y=515, width=70, height=60)
 
-        self.i_source_image = ImageTk.PhotoImage(Image.open("github.png").resize((70, 60)))
+        self.i_source_image = ImageTk.PhotoImage(GITHUB_ICON)
         self.i_source = tk.Label(root, image=self.i_source_image)
         self.i_source.place(x=690, y=515, width=70, height=60)
 
