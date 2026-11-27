@@ -88,8 +88,8 @@ def install_optifine(optifine_jar: Path, java_exe: Path) -> None:
 
 # No it doesn't actually do anything to optifine
 def patch_optifine() -> None:
-    launcher_profile = MC_DIR / "launcher_profile.json"
-    launcher_profile2 = MC_DIR / "launcher_profile_microsoft_store.json"
+    launcher_profile = MC_DIR / "launcher_profiles.json"
+    launcher_profile2 = MC_DIR / "launcher_profiles_microsoft_store.json"
 
     if launcher_profile.exists() and launcher_profile2.exists():
         return
@@ -102,7 +102,7 @@ def patch_optifine() -> None:
     }
 
     with open(launcher_profile, "w", encoding="utf-8") as f:
-        json.dump(profiles, f, indents=2)
+        json.dump(profiles, f, indent=2)
 
     with open(launcher_profile2, "w", encoding="utf-8") as f:
-        json.dump(profiles, f, indents=2)
+        json.dump(profiles, f, indent=2)
