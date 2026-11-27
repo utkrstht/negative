@@ -57,6 +57,9 @@ def get_negative_dir() -> Path:
 # Direct file stream
 def check_sha1_hashs(file: BufferedIOBase, hash: str) -> bool:
     # TODO: if hash is empty, return True
+    if not hash:
+        return True
+    
     file.seek(0)
     digest = file_digest(file, "sha1").hexdigest()
     file.seek(0)
@@ -66,6 +69,9 @@ def check_sha1_hashs(file: BufferedIOBase, hash: str) -> bool:
 # File path
 def check_sha1_hashf(file: Path, hash: str) -> bool:
     # TODO: if hash is empty, return True
+    if not hash:
+        return True
+     
     with open(file, "rb") as f:
         digest = file_digest(f, "sha1").hexdigest()
 
