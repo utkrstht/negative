@@ -4,6 +4,7 @@ from assets import download_asset_index, download_assets
 from libraries import download_libraries
 from java import download_java, get_java_exe, launch_minecraft
 from arguments import parse_game_arguments, parse_jvm_arguments
+from optifine import download_optifine, install_optifine
 from config import LAUNCHER_LOG
 from requests.exceptions import HTTPError
 import json
@@ -23,6 +24,17 @@ logger = logging.getLogger(__name__)
 # Target version (can be both a release and a snapshot)
 target = input("Please select your minecraft version (default: 26.3): ") or "26.3"
 username = input("Please enter your username: ") or "TestPlayer"
+
+# Optifine Check
+use_optifine = input("Would you like to download/use Optifine (You need to have a Minecraft version already installed), (y/n): ").strip().lower()
+
+if use_optifine not in ['y', 'n', 'yes', 'no']:
+    logger.info("User did not give a valid reply for Optifine Usage, defaulting to no")
+    use_optifine = False
+else:
+    use_optifine = use_optifine in ('y', 'yes')
+
+
 
 all_versions = fetch_versions(options="all")
 
@@ -45,7 +57,13 @@ for version in all_versions:
         except KeyError:
             logger.warning("Manifest does not provide javaVersion, defaulting to Java 8")
             java_version = "8"
+        java_path = get_java_exe(version=java_version, javaw=True)
 
+        if use_optifine:
+            optifine_path = download_optifine(version["id"])
+            # Run optifine installer
+            install_optifine(optifine_jar=optifine_path, java_exe=java_path)
+            
         # Get the client JAR
         jar_path = download_version_jar(version["id"], data)
 
@@ -67,7 +85,6 @@ for version in all_versions:
         download_java(java_version)
 
         # Get Java executable
-        java_path = get_java_exe(version=java_version, javaw=True)
         main_class = data['mainClass']
 
         # Get the arguments for JVM and minecraft
